@@ -212,3 +212,44 @@ void AnimateUV_TexID(NJS_MODEL_SADX* model, int texID, Uint16 u, INT16 v) {
 		}
 	}
 }
+
+void FlashScreen(ObjectMaster* obj)
+{
+	auto data = obj->Data1;
+
+	if (data->Action == 0)
+	{
+		data->field_A += data->Index;
+
+		if (data->field_A >= 255)
+		{
+			data->field_A = 255;
+			data->Action = 1;
+		}
+	}
+	else
+	{
+		data->field_A -= data->Index;
+
+		if (data->field_A <= 0)
+		{
+			data->field_A = 0;
+			data->Action = 2;
+			ScreenFade_Color.color = 0x00000000;
+			DeleteObject_(obj);
+			return;
+		}
+	}
+
+	ScreenFade_Color.color = data->Rotation.x;
+	ScreenFade_Color.argb.a = data->field_A;
+	ScreenFade_DrawColor();
+}
+
+void LoadFlashScreen(int color, int time)
+{
+	auto obj = LoadObject(LoadObj_Data1, 1, FlashScreen);
+
+	obj->Data1->Rotation.x = color;
+	obj->Data1->Index = time == 0 ? 4 : time;
+}

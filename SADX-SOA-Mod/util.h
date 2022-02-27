@@ -18,3 +18,4 @@ void PlayerLookAt(NJS_VECTOR* from, NJS_VECTOR* to, Angle* outx, Angle* outy);
 void LoadLandTableFile(LandTableInfo** info, const char* name, NJS_TEXLIST* texlist);
 void DrawObject_Queue(NJS_OBJECT* object, QueuedModelFlagsB flags);
 void AnimateUV_TexID(NJS_MODEL_SADX* model, int texID, Uint16 u, INT16 v);
+void LoadFlashScreen(int color, int time);

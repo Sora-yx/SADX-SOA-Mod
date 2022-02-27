@@ -84,7 +84,6 @@ void PlayerANTIOob()
 			EntityData1Ptrs[i]->Position = startpos;
 			EntityData1Ptrs[i]->Rotation.y = 0x8000;
 
-
 			if (i)
 				EntityData1Ptrs[i]->Position.x += posx;
 
@@ -100,7 +99,7 @@ void PirateIsle_Garden(ObjectMaster* obj)
 	switch (data->Action)
 	{
 	case 0:
-
+		LoadChildObject(LoadObj_Data1, Garden_TimeOfDay, obj);
 		data->Object = PirateSkyBox->getmodel();
 		obj->DisplaySub = PirateIsle_Display;
 		data->Action++;
