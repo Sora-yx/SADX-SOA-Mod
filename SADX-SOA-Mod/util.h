@@ -19,3 +19,6 @@ void LoadLandTableFile(LandTableInfo** info, const char* name, NJS_TEXLIST* texl
 void DrawObject_Queue(NJS_OBJECT* object, QueuedModelFlagsB flags);
 void AnimateUV_TexID(NJS_MODEL_SADX* model, int texID, Uint16 u, INT16 v);
 void LoadFlashScreen(int color, int time);
+void SetDrawingDistances(float level, float skybox);
+void SetLevelFog(float layer, float distance, int color);
+void FreeLandTableFile(LandTableInfo** info);

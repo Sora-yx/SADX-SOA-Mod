@@ -1,4 +1,5 @@
 #include "pch.h"
+#include "lighting.h"
 
 uint8_t timeDay = day;
 int timeDayTimer = 0;
@@ -31,19 +32,20 @@ void Garden_SetNextTimeOfDay()
 	switch (timeDay)
 	{
 	case day:
-		set_shader_flags(ShaderFlags_Blend, true);
-		set_blend(0, 5);
-		set_blend_factor(0.5f);
+		SetPaletteBlendMode();
+		SetPaletteBlend(0, 5);
+		SetPaletteBlendFactor(0.5f);
 		timeDay = evening;
 		break;
 	case evening:
-		set_shader_flags(ShaderFlags_Blend, true);
-		set_blend(0, 6);
-		set_blend_factor(0.5f);
+		SetPaletteBlendMode();
+		SetPaletteBlend(0, 6);
+		SetPaletteBlendFactor(0.5f);
 		timeDay = night;
 		break;
 	case night:
 	default:
+		UnsetPaletteBlendMode();
 		timeDay = day;
 		break;
 	}

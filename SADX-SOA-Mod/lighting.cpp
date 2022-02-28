@@ -70,9 +70,18 @@ void SetPaletteBlendFactor(float f)
 	}
 }
 
+void SetPaletteBlend(int a1, int a2)
+{
+	if (IsLantern)
+	{
+		set_blend(a1, a2);
+	}
+}
+
 void RegisterLandPalette(NJS_OBJECT* object)
 {
-	if (IsLantern == false) return;
+	if (IsLantern == false) 
+		return;
 
 	if (object->basicdxmodel)
 	{

@@ -253,3 +253,22 @@ void LoadFlashScreen(int color, int time)
 	obj->Data1->Rotation.x = color;
 	obj->Data1->Index = time == 0 ? 4 : time;
 }
+
+void SetDrawingDistances(float level, float skybox) {
+	LevelDrawDistance.Maximum = -level;
+	SkyboxDrawDistance.Maximum = skybox == 0.0f ? -level : -skybox;
+}
+
+void SetLevelFog(float layer, float distance, int color) {
+	LevelFogData.Layer = layer;
+	LevelFogData.Distance = distance;
+	LevelFogData.Color = color;
+	LevelFogData.Toggle = 1;
+}
+
+void FreeLandTableFile(LandTableInfo** info) {
+	if (*info) {
+		delete* info;
+		info = nullptr;
+	}
+}

@@ -1,11 +1,11 @@
 #include "pch.h"
 #include "sadx-util.h"
+#include "lighting.h"
 
 NJS_TEXNAME PirateIsle_TexNames[161];
 NJS_TEXLIST PirateIsle_TexList = { arrayptrandlength(PirateIsle_TexNames) };
 
 LandTableInfo* PirateIsleGeo = nullptr;
-Trampoline* LoadECGarden_t = nullptr;
 
 static ModelInfo* PirateSkyBox[3];
 
@@ -40,7 +40,7 @@ void Draw_SkyBoxDay(EntityData1* data)
 	njSetTexture(&PirateBG_TexList);
 	njPushMatrix(_nj_current_matrix_ptr_);
 	njTranslate(_nj_current_matrix_ptr_, 0, 0, 0);
-	late_DrawObject(data->Object, QueuedModelFlagsB_EnableZWrite);
+	dsDrawObject(data->Object);
 	njPopMatrix(1);
 	DrawQueueDepthBias = 0;
 }
@@ -66,7 +66,7 @@ void Draw_SkyBoxEvening()
 	njSetTexture(&PirateBG2_TexList);
 	njPushMatrix(_nj_current_matrix_ptr_);
 	njTranslate(_nj_current_matrix_ptr_, 0, 0, 0);
-	late_DrawObject(skybox, QueuedModelFlagsB_EnableZWrite);
+	dsDrawObject(skybox);
 	njPopMatrix(1);
 }
 
@@ -83,12 +83,13 @@ void Draw_SkyBoxNight()
 	njSetTexture(&PirateBG3_TexList);
 	njPushMatrix(_nj_current_matrix_ptr_);
 	njTranslate(_nj_current_matrix_ptr_, 0, 0, 0);
-	late_DrawObject(skybox, QueuedModelFlagsB_EnableZWrite);
+	dsDrawObject(skybox);
 	njPopMatrix(1);
 
 	AnimateUV_TexID(skybox->child->sibling->sibling->sibling->sibling->sibling->basicdxmodel, 6, 1, 0);
 	AnimateUV_TexID(skybox->child->sibling->sibling->basicdxmodel, 3, 1, 0);
 }
+
 
 void PirateIsle_Display(ObjectMaster* obj)
 {
@@ -97,13 +98,32 @@ void PirateIsle_Display(ObjectMaster* obj)
 
 	EntityData1* data = obj->Data1;
 
-	Direct3D_SetNearFarPlanes(0, SkyboxDrawDistance.Maximum);
+	njControl3D_Backup();
+	njControl3D_Add(NJD_CONTROL_3D_NO_CLIP_CHECK);
+	njControl3D_Remove(NJD_CONTROL_3D_DEPTH_QUEUE);
+	Direct3D_SetNearFarPlanes(SkyboxDrawDistance.Minimum, SkyboxDrawDistance.Maximum);
+	DisableFog();
 
 	Draw_SkyBoxDay(data);
 	Draw_SkyBoxEvening();
 	Draw_SkyBoxNight();
 
-	Direct3D_SetNearFarPlanes(0, LevelDrawDistance.Maximum);
+	ToggleStageFog();
+	Direct3D_SetNearFarPlanes(LevelDrawDistance.Minimum, LevelDrawDistance.Maximum);
+	njControl3D_Restore();
+}
+
+void PirateIsle_Skybox(ObjectMaster* obj)
+{
+	EntityData1* data = obj->Data1;
+
+	if (!data->Action) {
+		data->Object = PirateSkyBox[day]->getmodel();
+		obj->DisplaySub = PirateIsle_Display;
+		data->Action++;
+	}
+
+	obj->DisplaySub(obj);
 }
 
 NJS_VECTOR startpos = { 84, 100, 97.64 };
@@ -148,6 +168,21 @@ void PlayerANTIOob()
 	}
 }
 
+void PirateIsle_Garden_Delete()
+{
+	UnsetPaletteBlendMode();
+
+	for (uint8_t i = 0; i < LengthOfArray(PirateSkyBox); i++) {
+		FreeMDL(PirateSkyBox[i]);
+	}
+
+	FreeLandTableFile(&PirateIsleGeo);
+	njReleaseTexture(&PirateBG_TexList);
+	njReleaseTexture(&PirateBG2_TexList);
+	njReleaseTexture(&PirateBG3_TexList);
+	njReleaseTexture(&PirateIsle_TexList);
+}
+
 void PirateIsle_Garden(ObjectMaster* obj)
 {
 	EntityData1* data = obj->Data1;
@@ -156,8 +191,6 @@ void PirateIsle_Garden(ObjectMaster* obj)
 	{
 	case 0:
 		LoadChildObject(LoadObj_Data1, Garden_TimeOfDay, obj);
-		data->Object = PirateSkyBox[day]->getmodel();
-		obj->DisplaySub = PirateIsle_Display;
 		data->Action++;
 		break;
 	case 1:
@@ -171,11 +204,8 @@ void PirateIsle_Garden(ObjectMaster* obj)
 		break;
 	}
 
-	obj->DisplaySub(obj);
 	RunObjectChildren(obj);
 }
-
-DataPointer(int, LandTable_CollisionMeshCount, 0x03B36D3C);
 
 void Load_PirateMDL()
 {
@@ -187,7 +217,6 @@ void Load_PirateMDL()
 	LoadPVM("PirateIsle-BGTex", &PirateBG_TexList);
 	LoadPVM("PirateIsle-BGTex2", &PirateBG2_TexList);
 	LoadPVM("PirateIsle-BGTex3", &PirateBG3_TexList);
-
 }
 
 
@@ -197,7 +226,7 @@ void __cdecl ChaoStgGarden01EC_Load_r(ObjectMaster* parent)
 
 	SetGlobalPoint2Col_Colors(0xFF000000, 0xFF000000, 0xFF000000);
 	LevelFogData.Toggle = 0;
-	LoadChaoCamCol();
+	//LoadChaoCamCol();
 	Chao_CreateNormalCameraTask();
 	AlMsgFontInit();
 	LoadChaoTexlist("AL_TEX_COMMON", &ChaoTexLists[1], 1u);
@@ -228,25 +257,34 @@ void __cdecl ChaoStgGarden01EC_Load_r(ObjectMaster* parent)
 	parent->MainSub = PirateIsle_Garden;
 	parent->DeleteSub = ChaoStgGarden01EC_Delete;
 	LevelDrawDistance.Minimum = -1.0;
-	LevelDrawDistance.Maximum = -10000.0;
+	SetDrawingDistances(20000.0f, 58000.0);
+	SetLevelFog(-2.0f, 18000.0f, 0xFF000000);
 }
 
-void Load_PirateIsle()
+void LoadPirateIsle_Garden()
 {
+	PrintDebug("SOA Mod: Load Pirate Isle Garden...\n");
 
-	auto original = reinterpret_cast<decltype(Load_PirateIsle)*>(LoadECGarden_t->Target());
-	original();
-
-	auto pointer = (EntityData1*)0x3B36D30;
 
 	LoadLandTableFile(&PirateIsleGeo, "system\\PirateIsle.sa1lvl", &PirateIsle_TexList);
-	GeoLists[LevelIDs_ECGarden * 8] = PirateIsleGeo->getlandtable();
-	pointer->Action = 2;
-	DynamicCOLCount_B_Again = 0;
-	LandTable_CollisionMeshCount = 0;
+	LandTable* land = PirateIsleGeo->getlandtable();
+	GeoLists[LevelIDs_ECGarden * 8] = land;
+
+	for (int i = 0; i < PirateIsleGeo->getlandtable()->COLCount; ++i) {
+
+		if (land->Col[i].Flags & ColFlags_Visible) {
+			RegisterLandPalette(land->Col[i].Model);
+		}
+	}
+
+
+	SetChaoLandTable(land);
 
 	Load_PirateMDL();
-	//LoadObject(LoadObj_Data1, 2, PirateIsle_Garden);
+	LoadObject(LoadObj_Data1, 3, ChaoStgGarden01EC_Load_r);
+	LoadObject(LoadObj_Data1, 2, PirateIsle_Skybox);
+	ModuleDestructors[1] = PirateIsle_Garden_Delete;
+	PrintDebug("SOA Mod: Load over.\n");
 
 	return;
 }
@@ -265,11 +303,12 @@ void SetNewTreePos()
 	SetNumberMaxOfTree(3);
 };
 
+
 void init_PirateIsle()
 {
-	LoadECGarden_t = new Trampoline((int)LoadECGarden, (int)LoadECGarden + 0x5, Load_PirateIsle);
 	WriteData<5>((void*)0x423795, 0x90u); //Prevent DC Mod to load Chao Garden stuff.
-	WriteJump(ChaoStgGarden01EC_Load, ChaoStgGarden01EC_Load_r);
+	//WriteJump(ChaoStgGarden01EC_Load, ChaoStgGarden01EC_Load_r);
+	WriteJump(LoadECGarden, LoadPirateIsle_Garden);
 	SetNewTreePos();
 
 	Chao_ECChaoSpawnPoints[0] = { -92, -0, 124};

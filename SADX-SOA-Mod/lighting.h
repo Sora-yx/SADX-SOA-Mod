@@ -34,3 +34,4 @@ void SetPaletteBlendMode();
 void SetDiffusePaletteBlend(DiffuseIDs src, DiffuseIDs dst);
 void SetSpecularPaletteBlend(SpecularIDs src, SpecularIDs dst);
 void SetPaletteBlendFactor(float f);
+void SetPaletteBlend(int a1, int a2);
