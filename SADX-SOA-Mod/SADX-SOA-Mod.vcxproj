@@ -168,6 +168,7 @@
     <ClInclude Include="lighting.h" />
     <ClInclude Include="mod.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="sadx-util.h" />
     <ClInclude Include="util.h" />
   </ItemGroup>
   <ItemGroup>

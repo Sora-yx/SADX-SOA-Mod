@@ -76,33 +76,34 @@ void Garden_TimeOfDay(ObjectMaster* obj)
 	case 2:
 		data->InvulnerableTime = 0;
 		LoadFlashScreen(0x00000000, 2);
-		Garden_SetNextTimeOfDay();
 		data->Action++;
 		break;
 	case 3:
-		if (timeDay == night) {
-			StopMusic();
-			MusicList[MusicIDs_chao].Name = "Reflection";
+		if (++data->InvulnerableTime == 115)
+		{
+			Garden_SetNextTimeOfDay();
+			data->Action++;
 		}
-		else if (timeDay == day) {
-			StopMusic();
-			MusicList[MusicIDs_chao].Name = "Sky_Pirate_Isle";
-		}
-		else {
-			data->Action = 1;
-			return;
-		}
-
-		data->Action++;
 		break;
 	case 4:
-		if (++data->InvulnerableTime == 70)
+	
+		if (timeDay == night) {
+			MusicList[MusicIDs_chao].Name = "Reflection";
+
+		}
+		else if (timeDay == day) {
+			MusicList[MusicIDs_chao].Name = "Sky_Pirate_Isle";
+		}
+
+		if (timeDay != evening)
 		{
+			StopMusic();
 			InitializeSoundManager();
 			PlayMusic(MusicIDs_chao);
-			data->Action = 1;
 		}
-		break;
+		
+		data->Action = 1;
+		return;
 	default:
 		data->Action = 1;
 		break;

@@ -1,4 +1,5 @@
 #include "pch.h"
+#include "sadx-util.h"
 
 NJS_TEXNAME PirateIsle_TexNames[161];
 NJS_TEXLIST PirateIsle_TexList = { arrayptrandlength(PirateIsle_TexNames) };
@@ -43,6 +44,7 @@ void Draw_SkyBoxDay(EntityData1* data)
 	njPopMatrix(1);
 	DrawQueueDepthBias = 0;
 }
+
 
 void Draw_SkyBoxEvening()
 {
@@ -188,12 +190,6 @@ void Load_PirateMDL()
 
 }
 
-VoidFunc(LoadChaoCamCol, 0x72A750);
-VoidFunc(Chao_CreateNormalCameraTask, 0x72A570);
-VoidFunc(AlMsgFontInit, 0x724E60);
-VoidFunc(sub_722500, 0x722500);
-VoidFunc(SetChaoOnTheGarden, 0x715F20);
-VoidFunc(SetChaoFlag, 0x7290B0);
 
 void __cdecl ChaoStgGarden01EC_Load_r(ObjectMaster* parent)
 {
