@@ -30,16 +30,15 @@ void Draw_SkyBoxDay(EntityData1* data)
 	cloud[1] = cloud[0]->sibling;
 	cloud[2] = cloud[1]->sibling;
 
-	njSetTexture(&PirateBG_TexList);
-
 	AnimateUV_TexID(cloud[0]->basicdxmodel, 4, 0, 1);
 	AnimateUV_TexID(cloud[1]->basicdxmodel, 6, 0, 1);
 	AnimateUV_TexID(cloud[2]->basicdxmodel, 6, 0, 1);
 
 	DrawQueueDepthBias = -99999;
+
 	njSetTexture(&PirateBG_TexList);
 	njPushMatrix(_nj_current_matrix_ptr_);
-	njTranslate(_nj_current_matrix_ptr_, 0, 0, 0);
+	njTranslate(_nj_current_matrix_ptr_, Camera_Data1->Position.x, 0, Camera_Data1->Position.z);
 	dsDrawObject(data->Object);
 	njPopMatrix(1);
 	DrawQueueDepthBias = 0;
@@ -65,7 +64,7 @@ void Draw_SkyBoxEvening()
 
 	njSetTexture(&PirateBG2_TexList);
 	njPushMatrix(_nj_current_matrix_ptr_);
-	njTranslate(_nj_current_matrix_ptr_, 0, 0, 0);
+	njTranslate(_nj_current_matrix_ptr_, Camera_Data1->Position.x, 0, Camera_Data1->Position.z);
 	dsDrawObject(skybox);
 	njPopMatrix(1);
 }
@@ -82,7 +81,7 @@ void Draw_SkyBoxNight()
 
 	njSetTexture(&PirateBG3_TexList);
 	njPushMatrix(_nj_current_matrix_ptr_);
-	njTranslate(_nj_current_matrix_ptr_, 0, 0, 0);
+	njTranslate(_nj_current_matrix_ptr_, Camera_Data1->Position.x, 0, Camera_Data1->Position.z);
 	dsDrawObject(skybox);
 	njPopMatrix(1);
 

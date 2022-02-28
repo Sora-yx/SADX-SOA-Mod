@@ -12,7 +12,7 @@ uint8_t getTimeOfDay()
 
 void TimeOfDay_OnFrames()
 {
-	if (GameState != 15 || timeDay == night)
+	if (GameState != 15)
 		return;
 
 	timeDayTimer++;
@@ -68,7 +68,7 @@ void Garden_TimeOfDay(ObjectMaster* obj)
 	switch (data->Action)
 	{
 	case 0:
-		Garden_ForceTimeOfDay(day);
+		Garden_ForceTimeOfDay(evening);
 		data->Action++;
 		break;
 	case 1:
