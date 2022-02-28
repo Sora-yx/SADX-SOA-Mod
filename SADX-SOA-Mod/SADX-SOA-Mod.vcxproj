@@ -95,13 +95,14 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\sadx-mod-loader\libmodutils;$(ProjectDir)..\sadx-mod-loader\mod-loader-common\ModLoaderCommon;$(ProjectDir)..\sadx-mod-loader\SADXModLoader\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)sadx-mod-loader\libmodutils;$(SolutionDir)sadx-mod-loader\mod-loader-common\ModLoaderCommon;$(SolutionDir)sadx-mod-loader\SADXModLoader\include;$(SolutionDir)lantern-engine</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>$(SolutionDir)bin\ModLoaderCommon.lib;$(SolutionDir)bin\libmodutils.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(SolutionDir)lantern-engine\sadx-dc-lighting.lib;$(SolutionDir)bin\ModLoaderCommon.lib;$(SolutionDir)bin\libmodutils.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <DelayLoadDLLs>sadx-dc-lighting.dll</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -115,7 +116,7 @@
       <ConformanceMode>Default</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)sadx-mod-loader\libmodutils;$(SolutionDir)sadx-mod-loader\mod-loader-common\ModLoaderCommon;$(SolutionDir)sadx-mod-loader\SADXModLoader\include;$(SolutionDir)sadx-mod-loader\extlib\bass;$(SolutionDir)lantern-engine</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)sadx-mod-loader\libmodutils;$(SolutionDir)sadx-mod-loader\mod-loader-common\ModLoaderCommon;$(SolutionDir)sadx-mod-loader\SADXModLoader\include;$(SolutionDir)lantern-engine</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -124,7 +125,8 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
       <EnableUAC>true</EnableUAC>
-      <AdditionalDependencies>$(SolutionDir)bin\ModLoaderCommon.lib;$(SolutionDir)bin\libmodutils.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(SolutionDir)lantern-engine\sadx-dc-lighting.lib;$(SolutionDir)bin\ModLoaderCommon.lib;$(SolutionDir)bin\libmodutils.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <DelayLoadDLLs>sadx-dc-lighting.dll</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -163,6 +165,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
+    <ClInclude Include="lighting.h" />
     <ClInclude Include="mod.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="util.h" />
@@ -170,6 +173,7 @@
   <ItemGroup>
     <ClCompile Include="config.cpp" />
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="lighting.cpp" />
     <ClCompile Include="mod.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

@@ -1,4 +1,5 @@
 #include "pch.h"
+#include "lighting.h"
 
 HelperFunctions HelperFunctionsGlobal;
 std::string modpath;
@@ -22,6 +23,12 @@ extern "C" {
 
 		ReadConfig(path, helperFunctions);
 		init_PirateIsle();
+	}
+
+	__declspec(dllexport) void __cdecl OnInitEnd() {
+		
+		LightingAPI_InitEnd();
+
 	}
 
 

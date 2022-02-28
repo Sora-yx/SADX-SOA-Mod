@@ -1,14 +1,13 @@
 #include "pch.h"
 
-enum TimeOfDayE {
-	day,
-	evening,
-	night
-};
-
 uint8_t timeDay = day;
 int timeDayTimer = 0;
 const int timeDayValue = 1000;
+
+uint8_t getTimeOfDay()
+{
+	return timeDay;
+}
 
 void TimeOfDay_OnFrames()
 {
@@ -32,9 +31,15 @@ void Garden_SetNextTimeOfDay()
 	switch (timeDay)
 	{
 	case day:
+		set_shader_flags(ShaderFlags_Blend, true);
+		set_blend(0, 5);
+		set_blend_factor(0.5f);
 		timeDay = evening;
 		break;
 	case evening:
+		set_shader_flags(ShaderFlags_Blend, true);
+		set_blend(0, 6);
+		set_blend_factor(0.5f);
 		timeDay = night;
 		break;
 	case night:
@@ -61,7 +66,7 @@ void Garden_TimeOfDay(ObjectMaster* obj)
 	switch (data->Action)
 	{
 	case 0:
-		Garden_ForceTimeOfDay(evening);
+		Garden_ForceTimeOfDay(day);
 		data->Action++;
 		break;
 	case 1:

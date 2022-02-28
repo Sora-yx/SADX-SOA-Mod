@@ -6,11 +6,87 @@ NJS_TEXLIST PirateIsle_TexList = { arrayptrandlength(PirateIsle_TexNames) };
 LandTableInfo* PirateIsleGeo = nullptr;
 Trampoline* LoadECGarden_t = nullptr;
 
-static ModelInfo* PirateSkyBox = nullptr;
+static ModelInfo* PirateSkyBox[3];
 
 NJS_TEXNAME PirateBG_TexNames[7];
 NJS_TEXLIST PirateBG_TexList = { arrayptrandlength(PirateBG_TexNames) };
 
+NJS_TEXNAME PirateBGEvening_TexNames[8];
+NJS_TEXLIST PirateBG2_TexList = { arrayptrandlength(PirateBGEvening_TexNames) };
+
+NJS_TEXNAME PirateBGNight_TexNames[8];
+NJS_TEXLIST PirateBG3_TexList = { arrayptrandlength(PirateBGNight_TexNames) };
+
+void Draw_SkyBoxDay(EntityData1* data)
+{
+	if (getTimeOfDay() != day)
+		return;
+
+	if (!data->Object)
+		return;
+
+	NJS_OBJECT* cloud[3] = { data->Object->child->sibling->sibling->sibling->sibling->sibling };
+	cloud[1] = cloud[0]->sibling;
+	cloud[2] = cloud[1]->sibling;
+
+	njSetTexture(&PirateBG_TexList);
+
+	AnimateUV_TexID(cloud[0]->basicdxmodel, 4, 0, 1);
+	AnimateUV_TexID(cloud[1]->basicdxmodel, 6, 0, 1);
+	AnimateUV_TexID(cloud[2]->basicdxmodel, 6, 0, 1);
+
+	DrawQueueDepthBias = -99999;
+	njSetTexture(&PirateBG_TexList);
+	njPushMatrix(_nj_current_matrix_ptr_);
+	njTranslate(_nj_current_matrix_ptr_, 0, 0, 0);
+	late_DrawObject(data->Object, QueuedModelFlagsB_EnableZWrite);
+	njPopMatrix(1);
+	DrawQueueDepthBias = 0;
+}
+
+void Draw_SkyBoxEvening()
+{
+	if (getTimeOfDay() != evening)
+		return;
+
+	NJS_OBJECT* skybox = PirateSkyBox[evening]->getmodel();
+
+	if (!skybox)
+		return;
+
+	NJS_OBJECT* cloud[2] = { skybox->child->sibling->sibling->sibling->sibling->sibling };
+	cloud[1] = cloud[0]->sibling->sibling;
+
+	njSetTexture(&PirateBG2_TexList);
+	AnimateUV_TexID(cloud[0]->basicdxmodel, 6, 1, 0);
+	AnimateUV_TexID(cloud[1]->basicdxmodel, 8, 0, -1);
+
+	njSetTexture(&PirateBG2_TexList);
+	njPushMatrix(_nj_current_matrix_ptr_);
+	njTranslate(_nj_current_matrix_ptr_, 0, 0, 0);
+	late_DrawObject(skybox, QueuedModelFlagsB_EnableZWrite);
+	njPopMatrix(1);
+}
+
+void Draw_SkyBoxNight()
+{
+	if (getTimeOfDay() != night)
+		return;
+
+	NJS_OBJECT* skybox = PirateSkyBox[night]->getmodel();
+
+	if (!skybox)
+		return;
+
+	njSetTexture(&PirateBG3_TexList);
+	njPushMatrix(_nj_current_matrix_ptr_);
+	njTranslate(_nj_current_matrix_ptr_, 0, 0, 0);
+	late_DrawObject(skybox, QueuedModelFlagsB_EnableZWrite);
+	njPopMatrix(1);
+
+	AnimateUV_TexID(skybox->child->sibling->sibling->sibling->sibling->sibling->basicdxmodel, 6, 1, 0);
+	AnimateUV_TexID(skybox->child->sibling->sibling->basicdxmodel, 3, 1, 0);
+}
 
 void PirateIsle_Display(ObjectMaster* obj)
 {
@@ -19,35 +95,16 @@ void PirateIsle_Display(ObjectMaster* obj)
 
 	EntityData1* data = obj->Data1;
 
-	NJS_OBJECT* cloud[3] = { data->Object->child->sibling->sibling->sibling->sibling->sibling };
-	cloud[1] = cloud[0]->sibling;
-	cloud[2] = cloud[1]->sibling;
-
 	Direct3D_SetNearFarPlanes(0, SkyboxDrawDistance.Maximum);
-	njSetTexture(&PirateBG_TexList);
-	DisableFog();
 
-	//draw and animate cloud
-	for (uint8_t i = 0; i < LengthOfArray(cloud); i++) {
-		DrawObject_Queue(cloud[i], QueuedModelFlagsB_EnableZWrite);
-		AnimateUV_TexID(cloud[i]->basicdxmodel, 4, 0, -1);
-		AnimateUV_TexID(cloud[i]->basicdxmodel, 6, 0, -1);
-	}
-
-	ToggleStageFog();
-
-	DrawQueueDepthBias = -99999;
-	DrawObject_Queue(data->Object->child, QueuedModelFlagsB_EnableZWrite);
-	DrawObject_Queue(data->Object->child->sibling, QueuedModelFlagsB_EnableZWrite);
-	DrawObject_Queue(data->Object->child->sibling->sibling, QueuedModelFlagsB_EnableZWrite);
-	DrawObject_Queue(data->Object->child->sibling->sibling->sibling, QueuedModelFlagsB_EnableZWrite);
-	DrawObject_Queue(data->Object->child->sibling->sibling->sibling->sibling, QueuedModelFlagsB_EnableZWrite);
-	DrawQueueDepthBias = 0;
+	Draw_SkyBoxDay(data);
+	Draw_SkyBoxEvening();
+	Draw_SkyBoxNight();
 
 	Direct3D_SetNearFarPlanes(0, LevelDrawDistance.Maximum);
 }
 
-NJS_VECTOR startpos = { 84, 62, 97.64 };
+NJS_VECTOR startpos = { 84, 100, 97.64 };
 
 void PlayerStartPos()
 {
@@ -58,7 +115,6 @@ void PlayerStartPos()
 		if (!EntityData1Ptrs[i])
 			continue;
 
-
 		EntityData1Ptrs[i]->Position = startpos;
 		EntityData1Ptrs[i]->Rotation.y = 0x8000;
 
@@ -67,13 +123,11 @@ void PlayerStartPos()
 
 		posx += 5;
 	}
-
 }
 
 void PlayerANTIOob()
 {
 	char posx = 5;
-
 
 	for (uint8_t i = 0; i < 8; i++) {
 
@@ -100,7 +154,7 @@ void PirateIsle_Garden(ObjectMaster* obj)
 	{
 	case 0:
 		LoadChildObject(LoadObj_Data1, Garden_TimeOfDay, obj);
-		data->Object = PirateSkyBox->getmodel();
+		data->Object = PirateSkyBox[day]->getmodel();
 		obj->DisplaySub = PirateIsle_Display;
 		data->Action++;
 		break;
@@ -124,8 +178,13 @@ DataPointer(int, LandTable_CollisionMeshCount, 0x03B36D3C);
 void Load_PirateMDL()
 {
 
-	PirateSkyBox = LoadBasicModel("PirateIsle-SkyBox");
+	PirateSkyBox[day] = LoadBasicModel("PirateIsle-SkyBox");
+	PirateSkyBox[evening] = LoadBasicModel("PirateIsle-SkyBox2");
+	PirateSkyBox[night] = LoadBasicModel("PirateIsle-SkyBox3");
+
 	LoadPVM("PirateIsle-BGTex", &PirateBG_TexList);
+	LoadPVM("PirateIsle-BGTex2", &PirateBG2_TexList);
+	LoadPVM("PirateIsle-BGTex3", &PirateBG3_TexList);
 
 }
 
