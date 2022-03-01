@@ -59,5 +59,8 @@
     <ClCompile Include="lighting.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Chao-Fixes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

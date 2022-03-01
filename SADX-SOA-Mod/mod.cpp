@@ -1,5 +1,4 @@
 #include "pch.h"
-#include "lighting.h"
 
 HelperFunctions HelperFunctionsGlobal;
 std::string modpath;
@@ -14,15 +13,12 @@ extern "C" {
 				L"Mod Name Error: Mod Loader out of date", MB_OK | MB_ICONERROR);
 		}
 
-
-
 		HelperFunctionsGlobal = helperFunctions; // Save the helper pointer for external use
 
-
 		modpath = path;
-
 		ReadConfig(path, helperFunctions);
 		init_PirateIsle();
+		init_ChaoFixes();
 	}
 
 	__declspec(dllexport) void __cdecl OnInitEnd() {

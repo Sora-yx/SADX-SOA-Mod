@@ -1,6 +1,4 @@
 #include "pch.h"
-#include "sadx-util.h"
-#include "lighting.h"
 
 NJS_TEXNAME PirateIsle_TexNames[161];
 NJS_TEXLIST PirateIsle_TexList = { arrayptrandlength(PirateIsle_TexNames) };
@@ -15,15 +13,12 @@ NJS_TEXLIST PirateBG_TexList = { arrayptrandlength(PirateBG_TexNames) };
 NJS_TEXNAME PirateBGEvening_TexNames[8];
 NJS_TEXLIST PirateBG2_TexList = { arrayptrandlength(PirateBGEvening_TexNames) };
 
-NJS_TEXNAME PirateBGNight_TexNames[8];
+NJS_TEXNAME PirateBGNight_TexNames[7];
 NJS_TEXLIST PirateBG3_TexList = { arrayptrandlength(PirateBGNight_TexNames) };
 
 void Draw_SkyBoxDay(EntityData1* data)
 {
-	if (getTimeOfDay() != day)
-		return;
-
-	if (!data->Object)
+	if (getTimeOfDay() != day || !data->Object)
 		return;
 
 	NJS_OBJECT* cloud[3] = { data->Object->child->sibling->sibling->sibling->sibling->sibling };
@@ -43,7 +38,6 @@ void Draw_SkyBoxDay(EntityData1* data)
 	njPopMatrix(1);
 	DrawQueueDepthBias = 0;
 }
-
 
 void Draw_SkyBoxEvening()
 {
@@ -82,7 +76,7 @@ void Draw_SkyBoxNight()
 	njSetTexture(&PirateBG3_TexList);
 	njPushMatrix(_nj_current_matrix_ptr_);
 	njTranslate(_nj_current_matrix_ptr_, Camera_Data1->Position.x, 0, Camera_Data1->Position.z);
-	dsDrawObject(skybox);
+	dsDrawObject(skybox); //fix transparency issue
 	njPopMatrix(1);
 
 	AnimateUV_TexID(skybox->child->sibling->sibling->sibling->sibling->sibling->basicdxmodel, 6, 1, 0);
@@ -125,7 +119,7 @@ void PirateIsle_Skybox(ObjectMaster* obj)
 	obj->DisplaySub(obj);
 }
 
-NJS_VECTOR startpos = { 84, 100, 97.64 };
+NJS_VECTOR startpos = { 84, 80, 97.64 };
 
 void PlayerStartPos()
 {
@@ -167,9 +161,18 @@ void PlayerANTIOob()
 	}
 }
 
+
+void SetNumberMaxOfTree(uint8_t number)
+{
+	WriteData<1>((int*)0x717bc6, number);
+	return;
+}
+
+
 void PirateIsle_Garden_Delete()
 {
 	UnsetPaletteBlendMode();
+	SetNumberMaxOfTree(5);
 
 	for (uint8_t i = 0; i < LengthOfArray(PirateSkyBox); i++) {
 		FreeMDL(PirateSkyBox[i]);
@@ -180,6 +183,7 @@ void PirateIsle_Garden_Delete()
 	njReleaseTexture(&PirateBG2_TexList);
 	njReleaseTexture(&PirateBG3_TexList);
 	njReleaseTexture(&PirateIsle_TexList);
+	MusicList[MusicIDs_chao].Name = "chao";
 }
 
 void PirateIsle_Garden(ObjectMaster* obj)
@@ -208,7 +212,6 @@ void PirateIsle_Garden(ObjectMaster* obj)
 
 void Load_PirateMDL()
 {
-
 	PirateSkyBox[day] = LoadBasicModel("PirateIsle-SkyBox");
 	PirateSkyBox[evening] = LoadBasicModel("PirateIsle-SkyBox2");
 	PirateSkyBox[night] = LoadBasicModel("PirateIsle-SkyBox3");
@@ -217,7 +220,6 @@ void Load_PirateMDL()
 	LoadPVM("PirateIsle-BGTex2", &PirateBG2_TexList);
 	LoadPVM("PirateIsle-BGTex3", &PirateBG3_TexList);
 }
-
 
 void __cdecl ChaoStgGarden01EC_Load_r(ObjectMaster* parent)
 {
@@ -251,7 +253,11 @@ void __cdecl ChaoStgGarden01EC_Load_r(ObjectMaster* parent)
 	ChaoDX_Message_PlayerAction_Load();
 	SetChaoFlag();
 	InitializeSoundManager();
-	MusicList[MusicIDs_chao].Name = "Sky_Pirate_Isle";
+	if (timeDayOption != alwaysNight)
+		MusicList[MusicIDs_chao].Name = "Sky_Pirate_Isle";
+	else
+		MusicList[MusicIDs_chao].Name = "Reflection";
+
 	PlayMusic(MusicIDs_chao);
 	parent->MainSub = PirateIsle_Garden;
 	parent->DeleteSub = ChaoStgGarden01EC_Delete;
@@ -264,7 +270,6 @@ void LoadPirateIsle_Garden()
 {
 	PrintDebug("SOA Mod: Load Pirate Isle Garden...\n");
 
-
 	LoadLandTableFile(&PirateIsleGeo, "system\\PirateIsle.sa1lvl", &PirateIsle_TexList);
 	LandTable* land = PirateIsleGeo->getlandtable();
 	GeoLists[LevelIDs_ECGarden * 8] = land;
@@ -276,7 +281,6 @@ void LoadPirateIsle_Garden()
 		}
 	}
 
-
 	SetChaoLandTable(land);
 
 	Load_PirateMDL();
@@ -285,12 +289,6 @@ void LoadPirateIsle_Garden()
 	ModuleDestructors[1] = PirateIsle_Garden_Delete;
 	PrintDebug("SOA Mod: Load over.\n");
 
-	return;
-}
-
-void SetNumberMaxOfTree(uint8_t number)
-{
-	WriteData<1>((int*)0x717bc6, number);
 	return;
 }
 
@@ -306,7 +304,6 @@ void SetNewTreePos()
 void init_PirateIsle()
 {
 	WriteData<5>((void*)0x423795, 0x90u); //Prevent DC Mod to load Chao Garden stuff.
-	//WriteJump(ChaoStgGarden01EC_Load, ChaoStgGarden01EC_Load_r);
 	WriteJump(LoadECGarden, LoadPirateIsle_Garden);
 	SetNewTreePos();
 
@@ -326,4 +323,5 @@ void init_PirateIsle()
 	Chao_ECChaoSpawnPoints[13] = { 109, 26, 8.92 };
 	Chao_ECChaoSpawnPoints[14] = { -71, 0, -76 };
 	Chao_ECChaoSpawnPoints[15] = { -28, -0, -67 };
+	return;
 }

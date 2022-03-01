@@ -1,6 +1,4 @@
 #include "pch.h"
-#include "mod.h"
-#include "lighting.h"
 
 static bool IsLantern = false;
 
