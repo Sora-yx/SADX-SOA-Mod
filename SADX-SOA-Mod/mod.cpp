@@ -4,6 +4,7 @@ HelperFunctions HelperFunctionsGlobal;
 std::string modpath;
 
 extern "C" {
+
 	__declspec(dllexport) void __cdecl Init(const char* path, const HelperFunctions& helperFunctions)
 	{
 		if (helperFunctions.Version < 11)
@@ -19,6 +20,7 @@ extern "C" {
 		ReadConfig(path, helperFunctions);
 		init_PirateIsle();
 		init_ChaoFixes();
+		init_Objects();
 	}
 
 	__declspec(dllexport) void __cdecl OnInitEnd() {

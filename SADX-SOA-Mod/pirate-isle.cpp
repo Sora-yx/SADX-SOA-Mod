@@ -184,6 +184,7 @@ void PirateIsle_Garden_Delete()
 	njReleaseTexture(&PirateBG3_TexList);
 	njReleaseTexture(&PirateIsle_TexList);
 	MusicList[MusicIDs_chao].Name = "chao";
+	Reset_LadderHack();
 }
 
 void PirateIsle_Garden(ObjectMaster* obj)
@@ -193,7 +194,9 @@ void PirateIsle_Garden(ObjectMaster* obj)
 	switch (data->Action)
 	{
 	case 0:
+		Set_LadderHack();
 		LoadChildObject(LoadObj_Data1, Garden_TimeOfDay, obj);
+		LoadObject(LoadObj_Data1, 2, LongLadder_main);
 		data->Action++;
 		break;
 	case 1:

@@ -20,6 +20,7 @@
 #include "lighting.h"
 
 #include "mod.h"
+#include "Objects.h"
 #include "util.h"
 #include "sadx-util.h"
 
