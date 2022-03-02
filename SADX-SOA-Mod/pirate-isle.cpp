@@ -187,7 +187,6 @@ void __cdecl RunLevelDestructor_r(int heap)
 		}
 	}
 
-
 	TARGET_DYNAMIC(RunLevelDestructor)(heap);
 }
 
@@ -209,14 +208,14 @@ void PirateIsle_Garden(ObjectMaster* obj)
 	switch (data->Action)
 	{
 	case 0:
-		Set_LadderHack();
+		LoadPirateIsle_Objects();
 		LoadChildObject(LoadObj_Data1, Garden_TimeOfDay, obj);
 		data->Action++;
 		break;
 	case 1:
 		if (++data->Index == 10) {
 			PlayerStartPos();
-			LoadObject(LoadObj_Data1, 2, LongLadder_main);
+	
 			data->Action++;
 		}
 		break;
@@ -237,6 +236,8 @@ void Load_PirateMDL()
 	LoadPVM("PirateIsle-BGTex", &PirateBG_TexList);
 	LoadPVM("PirateIsle-BGTex2", &PirateBG2_TexList);
 	LoadPVM("PirateIsle-BGTex3", &PirateBG3_TexList);
+
+	LoadLittleJack_ModelAnim();
 }
 
 void __cdecl ChaoStgGarden01EC_Load_r(ObjectMaster* parent)

@@ -69,3 +69,6 @@ struct ChaoData2_ {
 
 FunctionPointer(void, GetActiveCollisions, (float x, float y, float z, float radius), 0x43ACD0);
 FunctionPointer(int, GetGroundYPosition_CheckIntersection, (Mysterious64Bytes* a1, NJS_OBJECT* a2), 0x452B30);
+
+FastcallFunctionPointer(void, DrawChunkModel_, (Sint32* a1, Sint16* a2), 0x7917F0);
+void SetupWorldMatrix();

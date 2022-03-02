@@ -22,3 +22,6 @@ void LoadFlashScreen(int color, int time);
 void SetDrawingDistances(float level, float skybox);
 void SetLevelFog(float layer, float distance, int color);
 void FreeLandTableFile(LandTableInfo** info);
+AnimationFile* LoadObjectAnim(const char* name);
+void njCnkAction_Queue(NJS_ACTION* action, float frame, QueuedModelFlagsB flags);
+void njCnkAction(NJS_ACTION* action, float frame);

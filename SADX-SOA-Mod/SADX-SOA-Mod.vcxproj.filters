@@ -68,5 +68,8 @@
     <ClCompile Include="objects.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="little-jack.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

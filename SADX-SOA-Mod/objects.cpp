@@ -73,6 +73,13 @@ void Set_LadderHack()
 	WriteData<1>((int*)0x536d6b, 0x9);
 }
 
+void LoadPirateIsle_Objects()
+{
+	Set_LadderHack();
+	LoadObject(LoadObj_Data1, 2, LongLadder_main);
+	LoadObject(LoadObj_Data1, 2, LittleJack_Cameo);
+	return;
+}
 
 void init_Objects()
 { 
