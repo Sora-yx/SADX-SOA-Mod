@@ -124,6 +124,7 @@ void LookAt(NJS_VECTOR* unit, Angle* outx, Angle* outy) {
 }
 
 void LookAt(NJS_VECTOR* from, NJS_VECTOR* to, Angle* outx, Angle* outy) {
+
 	if (!from || !to)
 		return;
 
@@ -297,4 +298,8 @@ void FreeLandTableFile(LandTableInfo** info) {
 		delete* info;
 		info = nullptr;
 	}
+}
+
+float GetDistance(NJS_VECTOR* orig, NJS_VECTOR* dest) {
+	return sqrtf(powf(dest->x - orig->x, 2) + powf(dest->y - orig->y, 2) + powf(dest->z - orig->z, 2));
 }

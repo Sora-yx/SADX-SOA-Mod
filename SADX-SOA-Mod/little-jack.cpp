@@ -6,10 +6,24 @@ static AnimationFile* LittleJackAnim = nullptr;
 NJS_TEXNAME LittleJack_TexNames[7];
 NJS_TEXLIST LittleJack_TexList = { arrayptrandlength(LittleJack_TexNames) };
 
+struct PointToLook {
+	NJS_VECTOR pos;
+	int rotY;
+};
+
+PointToLook LJ_PointToLook[4] =
+{
+	{ {274, 167, -474}, -0x4000 },
+	{ {-310, 167, -450}, 0x0},
+	{ {-383, 167, 324}, 0x4000 },
+	{ {241, 167, 461}, 0x8000 }
+};
+
+
 int LJSpeed = 0;
 void TurnAndShift_LJ(EntityData1* data1, NJS_VECTOR* isleCenter) {
 
-	float radius = 270.0f;
+	float radius = 320.0f;
 	data1->Position.x = njSin(LJSpeed) * radius;
 
 	if (data1->CharID > 0)
@@ -23,7 +37,25 @@ void TurnAndShift_LJ(EntityData1* data1, NJS_VECTOR* isleCenter) {
 
 void LJ_doRotation(EntityData1* data) {
 
-	data->Rotation.y = BAMS_SubWrap(data->Rotation.y, 0x8000, 1024);
+
+	for (uint8_t i = 0; i < LengthOfArray(LJ_PointToLook); i++)
+	{
+		float pos = GetDistance(&LJ_PointToLook[i].pos, &data->Position);
+
+		if (pos < 250) {
+
+			if (!i)
+				data->Rotation.y = LJ_PointToLook[i].rotY;
+
+			if (data->Rotation.y > LJ_PointToLook[i].rotY)
+				data->Rotation.y -= 200;
+
+			if (data->Rotation.y < LJ_PointToLook[i].rotY)
+				data->Rotation.y += 200;
+		}
+	}
+
+
 	data->Rotation.x += 1024;
 	data->Rotation.z += 1024;
 }
@@ -31,19 +63,17 @@ void LJ_doRotation(EntityData1* data) {
 void LJ_TurnAround(EntityData1* data1, NJS_VECTOR* isleCenter) {
 
 	LJ_doRotation(data1);
-
-	LJSpeed += 60;
+	LJSpeed += 40;
 	TurnAndShift_LJ(data1, isleCenter);
-
 }
 
 void LittleJack_Display(ObjectMaster* obj)
 {
 
-	if (MissedFrames)
-		return;
-
 	EntityData1* data = obj->Data1;
+
+	if (MissedFrames || data->Action != 2 || getTimeOfDay() != day)
+		return;
 
 	njSetTexture(&LittleJack_TexList);
 	njPushMatrixEx();
@@ -61,6 +91,7 @@ void LittleJack_Display(ObjectMaster* obj)
 
 }
 
+const int timerCameo = 3760;
 void LittleJack_Cameo(ObjectMaster* obj)
 {
 	EntityData1* data = obj->Data1;
@@ -69,16 +100,36 @@ void LittleJack_Cameo(ObjectMaster* obj)
 	switch (data->Action)
 	{
 	case 0:
+
 		data->Scale = { 4, 4, 4 };
-		data->Position = { -262, 95, -269 };
+		data->Position = { -262, 120, -269 };
 		data->Object = LittleJackMDL->getmodel();
 		obj->DisplaySub = LittleJack_Display;
 		data->Action++;
+
 		break;
 	case 1:
+	case 2:
+
+		if (++data->InvulnerableTime == timerCameo)
+		{
+			data->InvulnerableTime = 0;
+			data->Action++;
+		}
+
 		LJ_TurnAround(data, &islePos);
 		break;
+	case 3:
+		data->InvulnerableTime = 0;
+		data->Rotation = { 0, 0, 0 };
+		data->Action++;
+		LJSpeed = 0;
+		break;
+	case 4:
+		data->Action = 1;
+		return;
 	}
+
 
 	obj->DisplaySub(obj);
 }

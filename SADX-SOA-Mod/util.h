@@ -25,3 +25,4 @@ void FreeLandTableFile(LandTableInfo** info);
 AnimationFile* LoadObjectAnim(const char* name);
 void njCnkAction_Queue(NJS_ACTION* action, float frame, QueuedModelFlagsB flags);
 void njCnkAction(NJS_ACTION* action, float frame);
+float GetDistance(NJS_VECTOR* orig, NJS_VECTOR* dest);

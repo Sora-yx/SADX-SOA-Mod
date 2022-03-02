@@ -264,8 +264,8 @@ void __cdecl ChaoStgGarden01EC_Load_r(ObjectMaster* parent)
 	position.y = 0.0;
 	position.z = 62.0;
 	LoadChaoNameMachine(&position, 0x0);
-	LoadChaoTransporter(parent, SADXChaoStage_MysticRuins, -20.0, 13.44, -214.0, 0x100);
-	LoadChaoTransporter(parent, SADXChaoStage_StationSquare, 5.0, 13.44, -220.51, 0x100);
+	LoadChaoTransporter(parent, SADXChaoStage_MysticRuins, -20.0, 13.44, -240.0, 0x0);
+	LoadChaoTransporter(parent, SADXChaoStage_StationSquare, 5.0, 13.44, -240.0, 0x0);
 	LoadChaoTransporter(parent, 8, 487.0, 161.5300002, -109.0, 0x4000);
 	LoadHeldChao();
 	LoadHeldItem();
