@@ -4,6 +4,7 @@ NJS_TEXNAME PirateIsle_TexNames[161];
 NJS_TEXLIST PirateIsle_TexList = { arrayptrandlength(PirateIsle_TexNames) };
 
 LandTableInfo* PirateIsleGeo = nullptr;
+Trampoline* RunLevelDestructor_t = nullptr;
 
 static ModelInfo* PirateSkyBox[3];
 
@@ -168,23 +169,37 @@ void SetNumberMaxOfTree(uint8_t number)
 	return;
 }
 
+void __cdecl RunLevelDestructor_r(int heap)
+{
+	if (heap == 0)
+	{
+		if (LastLevel == LevelIDs_ECGarden || LastLevel == LevelIDs_MRGarden || LastLevel == LevelIDs_SSGarden) {
+			for (uint8_t i = 0; i < LengthOfArray(PirateSkyBox); i++) {
+				FreeMDL(PirateSkyBox[i]);
+			}
 
-void PirateIsle_Garden_Delete()
+			FreeLandTableFile(&PirateIsleGeo);
+			njReleaseTexture(&PirateIsle_TexList);
+			njReleaseTexture(&PirateBG_TexList);
+			njReleaseTexture(&PirateBG2_TexList);
+			njReleaseTexture(&PirateBG3_TexList);
+
+		}
+	}
+
+
+	TARGET_DYNAMIC(RunLevelDestructor)(heap);
+}
+
+
+void PirateIsle_Delete(ObjectMaster* obj)
 {
 	UnsetPaletteBlendMode();
 	SetNumberMaxOfTree(5);
-
-	for (uint8_t i = 0; i < LengthOfArray(PirateSkyBox); i++) {
-		FreeMDL(PirateSkyBox[i]);
-	}
-
-	FreeLandTableFile(&PirateIsleGeo);
-	njReleaseTexture(&PirateBG_TexList);
-	njReleaseTexture(&PirateBG2_TexList);
-	njReleaseTexture(&PirateBG3_TexList);
-	njReleaseTexture(&PirateIsle_TexList);
 	MusicList[MusicIDs_chao].Name = "chao";
 	Reset_LadderHack();
+	ChaoStgGarden01EC_Delete(obj);
+	return;
 }
 
 void PirateIsle_Garden(ObjectMaster* obj)
@@ -196,12 +211,12 @@ void PirateIsle_Garden(ObjectMaster* obj)
 	case 0:
 		Set_LadderHack();
 		LoadChildObject(LoadObj_Data1, Garden_TimeOfDay, obj);
-		LoadObject(LoadObj_Data1, 2, LongLadder_main);
 		data->Action++;
 		break;
 	case 1:
 		if (++data->Index == 10) {
 			PlayerStartPos();
+			LoadObject(LoadObj_Data1, 2, LongLadder_main);
 			data->Action++;
 		}
 		break;
@@ -263,7 +278,7 @@ void __cdecl ChaoStgGarden01EC_Load_r(ObjectMaster* parent)
 
 	PlayMusic(MusicIDs_chao);
 	parent->MainSub = PirateIsle_Garden;
-	parent->DeleteSub = ChaoStgGarden01EC_Delete;
+	parent->DeleteSub = PirateIsle_Delete;
 	LevelDrawDistance.Minimum = -1.0;
 	SetDrawingDistances(20000.0f, 58000.0);
 	SetLevelFog(-2.0f, 18000.0f, 0xFF000000);
@@ -289,7 +304,6 @@ void LoadPirateIsle_Garden()
 	Load_PirateMDL();
 	LoadObject(LoadObj_Data1, 3, ChaoStgGarden01EC_Load_r);
 	LoadObject(LoadObj_Data1, 2, PirateIsle_Skybox);
-	ModuleDestructors[1] = PirateIsle_Garden_Delete;
 	PrintDebug("SOA Mod: Load over.\n");
 
 	return;
@@ -309,6 +323,7 @@ void init_PirateIsle()
 	WriteData<5>((void*)0x423795, 0x90u); //Prevent DC Mod to load Chao Garden stuff.
 	WriteJump(LoadECGarden, LoadPirateIsle_Garden);
 	SetNewTreePos();
+	RunLevelDestructor_t = new Trampoline((int)RunLevelDestructor, (int)RunLevelDestructor + 0x6, RunLevelDestructor_r);
 
 	Chao_ECChaoSpawnPoints[0] = { -92, -0, 124};
 	Chao_ECChaoSpawnPoints[1] = { -40, -0, 127 };

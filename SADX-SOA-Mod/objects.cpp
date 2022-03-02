@@ -20,7 +20,7 @@ void __cdecl longladder_Display_r(ObjectMaster* a1)
 	int v3; // esi
 	float YDist; // [esp+0h] [ebp-Ch]
 
-	if (CurrentLevel == LevelIDs_ECGarden || MissedFrames)
+	if (IsLevelChaoGarden() || MissedFrames)
 		return;
 
 	data = a1->Data1;

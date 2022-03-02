@@ -1,7 +1,7 @@
 #include "pch.h"
 
 ModelInfo* LoadBasicModel(const char* name) {
-	PrintDebug("Loading basic model: %s... ", name);
+	PrintDebug("[Soa Mod] Loading basic model: %s... ", name);
 
 	std::string fullPath = "system\\models\\";
 	fullPath = fullPath + name + ".sa1mdl";
@@ -19,7 +19,7 @@ ModelInfo* LoadBasicModel(const char* name) {
 }
 
 ModelInfo* LoadChunkModel(const char* name) {
-	PrintDebug("[KH Mod] Loading chunk model: %s... ", name);
+	PrintDebug("[SOA Mod] Loading chunk model: %s... ", name);
 
 	std::string fullPath = "system\\models\\";
 	fullPath = fullPath + name + ".sa2mdl";
@@ -44,7 +44,7 @@ void LoadModelListFuncPtr(const char** names, int count, ModelInfo** mdls, Model
 
 void FreeMDL(ModelInfo* pointer) {
 	if (pointer) {
-		PrintDebug("[SHM] Freeing model: %s... \n", pointer->getdescription().c_str());
+		PrintDebug("[SOA Mod] Freeing model: %s... \n", pointer->getdescription().c_str());
 		delete(pointer);
 		pointer = nullptr;
 	}
@@ -267,6 +267,7 @@ void SetLevelFog(float layer, float distance, int color) {
 }
 
 void FreeLandTableFile(LandTableInfo** info) {
+
 	if (*info) {
 		delete* info;
 		info = nullptr;
