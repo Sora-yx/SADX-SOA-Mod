@@ -3,7 +3,11 @@
 NJS_TEXNAME PirateIsle_TexNames[161];
 NJS_TEXLIST PirateIsle_TexList = { arrayptrandlength(PirateIsle_TexNames) };
 
+NJS_TEXNAME Houses_TexNames[176];
+NJS_TEXLIST Houses_TexList = { arrayptrandlength(Houses_TexNames) };
+
 LandTableInfo* PirateIsleGeo = nullptr;
+LandTableInfo* HousesGeo = nullptr;
 Trampoline* RunLevelDestructor_t = nullptr;
 
 static ModelInfo* PirateSkyBox[3];
@@ -105,6 +109,29 @@ void PirateIsle_Display(ObjectMaster* obj)
 	ToggleStageFog();
 	Direct3D_SetNearFarPlanes(LevelDrawDistance.Minimum, LevelDrawDistance.Maximum);
 	njControl3D_Restore();
+
+	LandTable* land = HousesGeo->getlandtable();
+
+	float color = (1.0f - powf(njSin(data->field_A), 2.0f)) * 0.6f + 0.2f;
+
+	for (int i = 0; i < land->COLCount; ++i) {
+		if (IsPlayerInsideSphere(&land->Col[i].Center, powf(land->Col[i].Radius, 2))) {
+			NJS_MATERIAL* mat = land->Col[i].Model->basicdxmodel->mats;
+
+			if (mat->attr_texId == 0 || mat->attr_texId == 6) {
+				for (Uint8 j = 0; j < land->Col[i].Model->basicdxmodel->nbMat; ++j) {
+					mat[j].diffuse.argb.b = static_cast<Uint8>(color * 255);
+					mat[j].diffuse.argb.r = static_cast<Uint8>(color * 255);
+					mat[j].diffuse.argb.g = static_cast<Uint8>(color * 255);
+				}
+			}
+
+			njSetTexture(&Houses_TexList);
+			njPushMatrix(0);
+			DrawObject(land->Col[i].Model);
+			njPopMatrix(1u);
+		}
+	}
 }
 
 void PirateIsle_Skybox(ObjectMaster* obj)
@@ -229,6 +256,8 @@ void PirateIsle_Garden(ObjectMaster* obj)
 
 void Load_PirateMDL()
 {
+	LoadPVM("housesTex", &Houses_TexList);
+
 	PirateSkyBox[day] = LoadBasicModel("PirateIsle-SkyBox");
 	PirateSkyBox[evening] = LoadBasicModel("PirateIsle-SkyBox2");
 	PirateSkyBox[night] = LoadBasicModel("PirateIsle-SkyBox3");
@@ -238,12 +267,15 @@ void Load_PirateMDL()
 	LoadPVM("PirateIsle-BGTex3", &PirateBG3_TexList);
 
 	LoadLittleJack_ModelAnim();
+	LoadOBJModels();
 }
+
+
 
 void __cdecl ChaoStgGarden01EC_Load_r(ObjectMaster* parent)
 {
 	NJS_VECTOR position; // [esp+4h] [ebp-Ch] BYREF
-
+	LoadObject(LoadObj_Data1, 8, init_SetObj);
 	SetGlobalPoint2Col_Colors(0xFF000000, 0xFF000000, 0xFF000000);
 	LevelFogData.Toggle = 0;
 	//LoadChaoCamCol();
@@ -272,17 +304,25 @@ void __cdecl ChaoStgGarden01EC_Load_r(ObjectMaster* parent)
 	ChaoDX_Message_PlayerAction_Load();
 	SetChaoFlag();
 	InitializeSoundManager();
+
+
 	if (timeDayOption != alwaysNight)
 		MusicList[MusicIDs_chao].Name = "Sky_Pirate_Isle";
 	else
 		MusicList[MusicIDs_chao].Name = "Reflection";
 
 	PlayMusic(MusicIDs_chao);
+
+	std::string path = "SETPIRATE.BIN";
+	LoadFileWithMalloc(path.c_str(), (LPVOID*)&SetFiles[CurrentAct]);
+	SetFileB[CurrentAct] = SetFiles[CurrentAct];
+	SetFileB[CurrentAct]->XRotation = SetFileB[CurrentAct]->XRotation;
 	parent->MainSub = PirateIsle_Garden;
 	parent->DeleteSub = PirateIsle_Delete;
 	LevelDrawDistance.Minimum = -1.0;
 	SetDrawingDistances(20000.0f, 58000.0);
 	SetLevelFog(-2.0f, 18000.0f, 0xFF000000);
+	CurrentSetFile = CurrentSetFile;
 }
 
 void LoadPirateIsle_Garden()
@@ -293,7 +333,7 @@ void LoadPirateIsle_Garden()
 	LandTable* land = PirateIsleGeo->getlandtable();
 	GeoLists[LevelIDs_ECGarden * 8] = land;
 
-	for (int i = 0; i < PirateIsleGeo->getlandtable()->COLCount; ++i) {
+	for (int i = 0; i < land->COLCount; ++i) {
 
 		if (land->Col[i].Flags & ColFlags_Visible) {
 			RegisterLandPalette(land->Col[i].Model);
@@ -301,6 +341,17 @@ void LoadPirateIsle_Garden()
 	}
 
 	SetChaoLandTable(land);
+
+	LoadLandTableFile(&HousesGeo, "system\\Houses.sa1lvl", &Houses_TexList);
+	auto extraLand = HousesGeo->getlandtable();
+
+	for (int i = 0; i < extraLand->COLCount; ++i) {
+
+		if (extraLand->Col[i].Flags & ColFlags_Visible) {
+			RegisterLandPalette(extraLand->Col[i].Model);
+		}
+	}
+
 
 	Load_PirateMDL();
 	LoadObject(LoadObj_Data1, 3, ChaoStgGarden01EC_Load_r);

@@ -1,5 +1,10 @@
 #include "pch.h"
 
+static ModelInfo* DojoDoor[2];
+static ModelInfo* Door = nullptr;
+
+
+
 void LongLadder_main(ObjectMaster* obj)
 {
 	EntityData1* data = obj->Data1;
@@ -81,7 +86,79 @@ void LoadPirateIsle_Objects()
 	return;
 }
 
+void LoadDojoDoor(ObjectMaster* obj)
+{
+
+}
+
+void obj_DisplaySubRegular(ObjectMaster* obj)
+{
+	if (MissedFrames)
+		return;
+
+	EntityData1* data = obj->Data1;
+
+	njSetTexture(CurrentLandTable->TexList);
+	njPushMatrix(0);
+	njTranslateV(0, &data->Position);
+	dsDrawObject(data->Object);
+	njPopMatrix(1u);
+
+}
+
+void obj_MainGlobal(ObjectMaster* obj)
+{
+	EntityData1* data = obj->Data1;
+
+	if (!data->Action)
+	{
+		obj->DisplaySub = obj_DisplaySubRegular;
+		data->Action++;
+	}
+
+	obj->DisplaySub(obj);
+}
+
+void LoadDoor(ObjectMaster* obj)
+{
+	obj->Data1->Object = Door->getmodel();
+	obj->MainSub = obj_MainGlobal;
+}
+
+ObjectListEntry EggCarrierChaoGardenObjectList_list[] = {
+	{2, 2, 1, 10000, 0, LoadDoor, "Door"},
+	{2, 2, 1, 10000, 0, LoadDojoDoor, "DojoDoor"},
+	{2, 3, 1, 10000, 0, nullptr, "Laundry"},
+	{2, 3, 1, 10000, 0, nullptr, "Laundry2"},
+	{2, 3, 1, 10000, 0, nullptr, "chest"},
+	{2, 3, 1, 10000, 0, nullptr, "tree"},
+	{2, 3, 1, 10000, 0, nullptr, "weed"},
+	{2, 2, 1, 10000, 0, nullptr, "mill"},
+	{2, 2, 1, 10000, 0, nullptr, "hanky"},
+	{2, 2, 0, 0, 0, nullptr, "save"},
+
+};
+
+ObjectList EggCarrierChaoGardenObjectList = { arraylengthandptrT(EggCarrierChaoGardenObjectList_list, int) };
+
+void LoadOBJModels()
+{
+	DojoDoor[0] = LoadBasicModel("DoorDojo");
+	DojoDoor[1] = LoadBasicModel("DoorDojo2");
+	Door = LoadBasicModel("Door");
+	return;
+}
+
 void init_Objects()
 { 
 	WriteJump((void*)0x536C20, longladder_Display_r);
+
+	WriteCall((void*)0x42234F, PrintDebug);
+	//init new objlist
+	WriteData((ObjectList**)0x974FF8, &EggCarrierChaoGardenObjectList);
+	WriteData((ObjectList**)0x974FFC, &EggCarrierChaoGardenObjectList);
+	WriteData((ObjectList**)0x975000, &EggCarrierChaoGardenObjectList);
+	WriteData((ObjectList**)0x975004, &EggCarrierChaoGardenObjectList);
+	WriteData((ObjectList**)0x975008, &EggCarrierChaoGardenObjectList);
+
 }

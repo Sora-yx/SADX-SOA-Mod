@@ -72,3 +72,4 @@ FunctionPointer(int, GetGroundYPosition_CheckIntersection, (Mysterious64Bytes* a
 
 FastcallFunctionPointer(void, DrawChunkModel_, (Sint32* a1, Sint16* a2), 0x7917F0);
 void SetupWorldMatrix();
+ObjectFunc(init_SetObj, 0x46C3D0);
