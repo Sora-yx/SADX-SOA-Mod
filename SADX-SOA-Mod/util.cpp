@@ -303,3 +303,36 @@ void FreeLandTableFile(LandTableInfo** info) {
 float GetDistance(NJS_VECTOR* orig, NJS_VECTOR* dest) {
 	return sqrtf(powf(dest->x - orig->x, 2) + powf(dest->y - orig->y, 2) + powf(dest->z - orig->z, 2));
 }
+
+
+void obj_DisplaySubRegular(ObjectMaster* obj)
+{
+	if (MissedFrames)
+		return;
+
+	EntityData1* data = obj->Data1;
+
+	njSetTexture(CurrentLandTable->TexList);
+	njPushMatrix(0);
+	njRotateY(0, data->Rotation.y);
+	//njScaleV(0, &data->Scale);
+	njTranslate(0, data->Position.x, data->Position.y, data->Position.z);
+	dsDrawObject(data->Object);
+	njPopMatrix(1u);
+}
+
+void obj_MainGlobal(ObjectMaster* obj)
+{
+	EntityData1* data = obj->Data1;
+
+	if (ClipSetObject(obj))
+		return;
+
+	if (!data->Action)
+	{
+		obj->DisplaySub = obj_DisplaySubRegular;
+		data->Action++;
+	}
+
+	obj->DisplaySub(obj);
+}

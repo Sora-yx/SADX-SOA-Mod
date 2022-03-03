@@ -20,7 +20,7 @@ extern "C" {
 		ReadConfig(path, helperFunctions);
 		init_PirateIsle();
 		init_ChaoFixes();
-		init_Objects();
+		init_ObjectsHack();
 	}
 
 	__declspec(dllexport) void __cdecl OnInitEnd() {
