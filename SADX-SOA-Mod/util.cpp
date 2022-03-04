@@ -336,3 +336,15 @@ void obj_MainGlobal(ObjectMaster* obj)
 
 	obj->DisplaySub(obj);
 }
+
+void njTranslateX(float f) {
+	njTranslate(nullptr, f, 0, 0);
+}
+
+void njTranslateY(float f) {
+	njTranslate(nullptr, 0, f, 0);
+}
+
+void njTranslateZ(float f) {
+	njTranslate(nullptr, 0, 0, f);
+}

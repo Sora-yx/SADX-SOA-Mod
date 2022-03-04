@@ -6,6 +6,7 @@ static ModelInfo* Laundry[2];
 static ModelInfo* saveMDL = nullptr;
 static ModelInfo* saveMDLChild = nullptr;
 static ModelInfo* chest = nullptr;
+static ModelInfo* mill = nullptr;
 
 CollisionData saveCol = { 0, CI_FORM_SPHERE, 0x77, 0, 0,{ 0, 10, 0 }, 8.0f, 5.0f, 0.0f };
 CollisionData doorCol = { 0, CI_FORM_RECTANGLE, 0x77, 0, 0,{ -7, 10, -2 }, 8.0f, 10.0f, 2.0f };
@@ -15,10 +16,11 @@ void LongLadder_main(ObjectMaster* obj)
 {
 	EntityData1* data = obj->Data1;
 
+	if (ClipSetObject(obj))
+		return;
+
 	if (!data->Action)
 	{
-		data->Position = { -9, 57, -63 };
-		data->Rotation.y = 0x8000;
 		obj->MainSub = LongLadder_Main;
 	}
 }
@@ -26,10 +28,10 @@ void LongLadder_main(ObjectMaster* obj)
 void __cdecl longladder_Display_r(ObjectMaster* a1)
 {
 
-	EntityData1* data; // esi
-	Angle v2; // eax
-	int v3; // esi
-	float YDist; // [esp+0h] [ebp-Ch]
+	EntityData1* data; 
+	Angle v2;
+	int v3; 
+	float YDist;
 
 	if (IsLevelChaoGarden() || MissedFrames)
 		return;
@@ -334,8 +336,51 @@ void SaveObj_Main(ObjectMaster* obj)
 	AnimateUV_TexID(saveMDLChild->getmodel()->basicdxmodel, 160, 0, -2);
 	obj->DisplaySub(obj);
 	AddToCollisionList(data);
-
 }
+
+void Mill_Display(ObjectMaster* obj)
+{
+	if (MissedFrames)
+		return;
+
+	EntityData1* data = obj->Data1;
+
+	njSetTexture(CurrentLandTable->TexList);
+	njPushMatrix(0);
+	njTranslateV(0, &data->Position);
+	njRotateY(nullptr, obj->Data1->Rotation.y);
+	DrawModel(data->Object->basicdxmodel);
+
+	njRotateX(nullptr, data->Rotation.x);
+	DrawModel(data->Object->child->basicdxmodel);
+	DrawModel(data->Object->child->sibling->basicdxmodel);
+	DrawModel(data->Object->child->sibling->sibling->basicdxmodel);
+	DrawModel(data->Object->child->sibling->sibling->sibling->basicdxmodel);
+	DrawModel(data->Object->child->sibling->sibling->sibling->sibling->basicdxmodel);
+	DrawModel(data->Object->child->sibling->sibling->sibling->sibling->sibling->basicdxmodel);
+	DrawModel(data->Object->child->sibling->sibling->sibling->sibling->sibling->sibling->basicdxmodel);
+	njPopMatrix(1u);
+}
+
+void MillObj_Main(ObjectMaster* obj)
+{
+	EntityData1* data = obj->Data1;
+
+	if (ClipSetObject(obj))
+		return;
+
+
+	if (!data->Action) {
+		data->Object = mill->getmodel();
+		obj->DisplaySub = Mill_Display;
+		data->Action++;
+	}
+
+	data->Rotation.x += 140;
+
+	obj->DisplaySub(obj);
+}
+
 
 void LoadSave_Obj(ObjectMaster* obj)
 {
@@ -372,10 +417,14 @@ ObjectListEntry EggCarrierChaoGardenObjectList_list[] = {
 	{LoadObj_Data1, 3, 1, 80000, 0, nullptr, "chest"},
 	{LoadObj_Data1, 3, 1, 80000, 0, nullptr, "tree"},
 	{LoadObj_Data1, 3, 1, 80000, 0, nullptr, "weed"},
-	{LoadObj_Data1, 2, 1, 80000, 0, nullptr, "mill"},
+	{LoadObj_Data1, 2, 1, 120000, 0,  MillObj_Main, "mill"},
 	{LoadObj_Data1, 2, 1, 80000, 0, nullptr, "hanky"},
 	{LoadObj_Data1, 2, 1, 80000, 0, LoadSave_Obj, "save"},
-
+	{ LoadObj_Data1, 3, 0, 0, 0, (ObjectFuncPtr)0x4D4850, "C WALL" },
+	{ LoadObj_Data1, 2, 0, 0, 0, (ObjectFuncPtr)0x4D4700, "C SPHERE" }, 
+	{ LoadObj_Data1, 2, 0, 0, 0, (ObjectFuncPtr)0x4D4770, "C CYLINDER" }, 
+	{ LoadObj_Data1, 2, 0, 0, 0, (ObjectFuncPtr)0x4D47E0, "C CUBE" },
+	{LoadObj_Data1, 3, 0, 122500, 0, LongLadder_Main, "Ladder"},
 };
 
 ObjectList EggCarrierChaoGardenObjectList = { arraylengthandptrT(EggCarrierChaoGardenObjectList_list, int) };
@@ -390,6 +439,7 @@ void LoadOBJModels()
 	Laundry[1] = LoadBasicModel("Laundry2");
 	saveMDL = LoadBasicModel("Save");
 	saveMDLChild = LoadBasicModel("saveChild");
+	mill = LoadBasicModel("Mill");
 	return;
 }
 
@@ -426,7 +476,6 @@ void Set_LadderHack()
 void LoadPirateIsle_Objects()
 {
 	Set_LadderHack();
-	LoadObject(LoadObj_Data1, 2, LongLadder_main);
 	LoadObject(LoadObj_Data1, 2, LittleJack_Cameo);
 	return;
 }
