@@ -1,16 +1,16 @@
 #pragma once
 
-VoidFunc(LoadChaoCamCol, 0x72A750);
-VoidFunc(Chao_CreateNormalCameraTask, 0x72A570);
-VoidFunc(AlMsgFontInit, 0x724E60);
-VoidFunc(sub_722500, 0x722500);
-VoidFunc(SetChaoOnTheGarden, 0x715F20);
-VoidFunc(SetChaoFlag, 0x7290B0);
+struct POS_XZ
+{
+	int x;
+	int z;
+};
 
-DataPointer(int, LandTable_CollisionMeshCount, 0x03B36D3C);
-FunctionPointer(void, RunChaoBehaviour, (ObjectMaster* obj, void* func), 0x71EF10);
-
-
+struct LAND_ATTR_INDEX
+{
+	int nbIndex;
+	POS_XZ pos[1024];
+};
 
 enum StatusChao : __int16 {
 	StatusChao_Held = 0x1000,
@@ -67,9 +67,22 @@ struct ChaoData2_ {
 	char field_26B;
 };
 
+VoidFunc(LoadChaoCamCol, 0x72A750);
+VoidFunc(Chao_CreateNormalCameraTask, 0x72A570);
+VoidFunc(AlMsgFontInit, 0x724E60);
+VoidFunc(sub_722500, 0x722500);
+VoidFunc(SetChaoOnTheGarden, 0x715F20);
+VoidFunc(SetChaoFlag, 0x7290B0);
+
+DataPointer(int, LandTable_CollisionMeshCount, 0x03B36D3C);
+FunctionPointer(void, RunChaoBehaviour, (ObjectMaster* obj, void* func), 0x71EF10);
+
+DataArray(LAND_ATTR_INDEX, ChaoWayPoints, 0x3CA6EC8, 16);
+
 FunctionPointer(void, GetActiveCollisions, (float x, float y, float z, float radius), 0x43ACD0);
 FunctionPointer(int, GetGroundYPosition_CheckIntersection, (Mysterious64Bytes* a1, NJS_OBJECT* a2), 0x452B30);
 
 FastcallFunctionPointer(void, DrawChunkModel_, (Sint32* a1, Sint16* a2), 0x7917F0);
 void SetupWorldMatrix();
 ObjectFunc(init_SetObj, 0x46C3D0);
+

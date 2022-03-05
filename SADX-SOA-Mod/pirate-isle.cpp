@@ -213,6 +213,17 @@ void PirateIsle_Delete(ObjectMaster* obj)
 	return;
 }
 
+void Move_WayPoints_ToNewPose()
+{
+	for (uint8_t j = 0; j < 16; j++) {
+
+		for (int i = 0; i < ChaoWayPoints[j].nbIndex; i++)
+		{
+			ChaoWayPoints[j].pos[i].x -= 5.0f;
+		}
+	}
+}
+
 void PirateIsle_Garden(ObjectMaster* obj)
 {
 	EntityData1* data = obj->Data1;
@@ -220,6 +231,7 @@ void PirateIsle_Garden(ObjectMaster* obj)
 	switch (data->Action)
 	{
 	case 0:
+		Move_WayPoints_ToNewPose();
 		LoadPirateIsle_Objects();
 		LoadChildObject(LoadObj_Data1, Garden_TimeOfDay, obj);
 		data->Action++;
@@ -255,7 +267,7 @@ void __cdecl ChaoStgGarden01EC_Load_r(ObjectMaster* parent)
 	Set_LadderHack();
 	NJS_VECTOR position;
 
-	LoadObject(LoadObj_Data1, 8, init_SetObj);
+	LoadObject(LoadObj_Data1, 8, init_SetObj); //in SADX the gardens don't use any set object, we manually load those
 
 	SetGlobalPoint2Col_Colors(0xFF000000, 0xFF000000, 0xFF000000);
 	LevelFogData.Toggle = 0;
@@ -373,8 +385,7 @@ void SetNewTreePos()
 void init_PirateIsle()
 {
 	WriteData<5>((void*)0x423795, 0x90u); //Prevent DC Mod to load Chao Garden stuff.
-	//WriteJump(SetNextChaoStage, SetNextChaoStage_r);
-	WriteCall((void*)0x71570E, SetNextChaoStage_r);
+	WriteCall((void*)0x71570E, SetNextChaoStage_r); //Fix Objects not spawning 
 	WriteJump(LoadECGarden, LoadPirateIsle_Garden);
 	SetNewTreePos();
 

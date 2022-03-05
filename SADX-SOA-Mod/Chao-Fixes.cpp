@@ -94,14 +94,13 @@ BOOL __cdecl Chao_DetectWater_r(ObjectMaster* obj)
 void Chao_Main_R(ObjectMaster* obj) {
 	EntityData1* data = obj->Data1;
 
-	if (CurrentLevel == LevelIDs_ECGarden)
+	if (CurrentChaoStage == SADXChaoStage_EggCarrier)
 	{
 		if (obj->Data1)
 		{
 			if (obj->Data1->Position.y <= -5)
 			{
-				obj->Data1->Position = startpos;
-				obj->Data1->Position.y = 0;
+				obj->Data1->Position = Chao_ECChaoSpawnPoints[rand() % 16];
 			}
 		}
 	}
@@ -112,6 +111,6 @@ void Chao_Main_R(ObjectMaster* obj) {
 
 void init_ChaoFixes()
 {
-	 Chao_DetectWater_t = new Trampoline(0x73C200, 0x73C207, Chao_DetectWater_r);
-	//Chao_Main_t = new Trampoline((int)Chao_Main, (int)Chao_Main + 0x6, Chao_Main_R);
+	Chao_DetectWater_t = new Trampoline(0x73C200, 0x73C207, Chao_DetectWater_r);
+	Chao_Main_t = new Trampoline((int)Chao_Main, (int)Chao_Main + 0x6, Chao_Main_R);
 }
