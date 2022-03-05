@@ -12,6 +12,8 @@ CollisionData saveCol = { 0, CI_FORM_SPHERE, 0x77, 0, 0,{ 0, 10, 0 }, 8.0f, 5.0f
 CollisionData doorCol = { 0, CI_FORM_RECTANGLE, 0x77, 0, 0,{ -7, 10, -2 }, 8.0f, 10.0f, 2.0f };
 CollisionData dojoCol = { 0, CI_FORM_RECTANGLE, 0x77, 0, 0,{ -7, 10, -2 }, 15.0f, 10.0f, 2.0f, 0x0, 0x0, 0 };
 
+bool isLeavingGarden = false;
+
 void LongLadder_main(ObjectMaster* obj)
 {
 	EntityData1* data = obj->Data1;
@@ -57,112 +59,10 @@ void __cdecl longladder_Display_r(ObjectMaster* a1)
 }
 
 
-void Dojo_Display(ObjectMaster* obj)
-{
-	if (MissedFrames)
-		return;
-
-	EntityData1* data = obj->Data1;
-
-	njSetTexture(CurrentLandTable->TexList);
-	njPushMatrix(0);
-	njRotateXYZ(0, data->Rotation.x, data->Rotation.y, data->Rotation.z);
-	njTranslateV(0, &data->Position);
-	dsDrawObject(data->Object);
-	njPopMatrix(1u);
-}
-
-void Doji_Child(ObjectMaster* obj)
-{
-	if (ClipSetObject(obj))
-		return;
-
-	EntityData1* data = obj->Data1;
-	float result = data->field_A;
-	float diff = 30;
-
-	switch (data->Action)
-	{
-	case 0:
-		if (IsPlayerInsideSphere(&data->Position, 20))
-		{
-			if (Controllers[0].PressedButtons & Buttons_Y)
-			{
-				ForcePlayerAction(0, 12);
-				obj->Parent->Data1->Action = 1;
-				data->Action++;
-			}
-		}
-		break;
-	case 1:
-
-		if (data->Position.y > result)
-			data->Position.y--;
-		else {
-			ForcePlayerAction(0, 24);
-			data->Action++;
-		}
-		break;
-	case 2:
-		if (++data->InvulnerableTime == 300)
-		{
-			data->Position.y = result + diff;
-			data->Action = 0;
-			data->InvulnerableTime = 0;
-		}
-		break;
-	}
-
-	obj->DisplaySub(obj);
-}
-
 void Dojo_Main(ObjectMaster* obj)
 {
 	if (ClipSetObject(obj))
 		return;
-
-	EntityData1* data = obj->Data1;
-	float result = data->field_A;
-	float diff = 30;
-
-	switch (data->Action)
-	{
-	
-	case 0:
-		if (IsPlayerInsideSphere(&data->Position, 20))
-		{
-			if (Controllers[0].PressedButtons & Buttons_Y)
-			{
-				ForcePlayerAction(0, 12);
-				obj->Child->Data1->Action = 1;
-				data->Action++;
-			}
-		}
-		break;
-	case 1:
-
-		if (data->Position.y > result)
-			data->Position.y--;
-		else {
-			ForcePlayerAction(0, 24);
-			data->Action++;
-		}
-
-
-		break;
-	case 2:
-		if (++data->InvulnerableTime == 300)
-		{
-			data->Position.y = result + diff;
-			data->Action = 0;
-			data->InvulnerableTime = 0;
-		}
-		break;
-
-	}
-
-	if (!data->Action)
-		AddToCollisionList(obj->Data1);
 
 	RunObjectChildren(obj);
 	obj->DisplaySub(obj);
@@ -180,17 +80,16 @@ void LoadDojoDoor(ObjectMaster* obj)
 	Collision_Init(obj, &dojoCol, 1, 4u);
 
 	obj->MainSub = Dojo_Main;
-	obj->DisplaySub = Dojo_Display;
-	ObjectMaster* child = LoadChildObject(LoadObj_Data1, Doji_Child, obj);
+	obj->DisplaySub = obj_DisplaySubRegular;
+	ObjectMaster* child = LoadChildObject(LoadObj_Data1, obj_MainGlobal, obj);
 	child->Data1->Object = DojoDoor[0]->getmodel();
 	child->Data1->Position.z -= 32;
-	child->DisplaySub = Dojo_Display;
 	child->Data1->field_A = data->Position.y - 30;
 }
 
 void Door_Display(ObjectMaster* obj)
 {
-	if (MissedFrames)
+	if (MissedFrames || isLeavingGarden)
 		return;
 
 	EntityData1* data = obj->Data1;
@@ -208,47 +107,8 @@ void Door_Main(ObjectMaster* obj)
 	if (ClipSetObject(obj))
 		return;
 
-	EntityData1* data = obj->Data1;
-	float result = data->field_A;
-	float diff = 25;
 
-	switch (data->Action)
-	{
-	case 0:
-		if (IsPlayerInsideSphere(&data->Position, 20))
-		{
-			if (Controllers[0].PressedButtons & Buttons_Y)
-			{
-				ForcePlayerAction(0, 12);
-				data->Action++;
-			}
-		}
-		break;
-	case 1:
-
-		if (data->Position.y > result)
-			data->Position.y--;
-		else {
-			ForcePlayerAction(0, 24);
-			data->Action++;
-		}
-
-
-		break;
-	case 2:
-		if (++data->InvulnerableTime == 300)
-		{
-			data->Position.y = result + diff;
-			data->Action = 0;
-			data->InvulnerableTime = 0;
-		}
-		break;
-
-	}
-
-	if (!data->Action)
-		AddToCollisionList(obj->Data1);
-
+	AddToCollisionList(obj->Data1);
 	obj->DisplaySub(obj);
 }
 
@@ -277,7 +137,7 @@ void SaveObj_display(ObjectMaster* obj)
 {
 	EntityData1* data = obj->Data1;
 
-	if (MissedFrames)
+	if (MissedFrames || isLeavingGarden)
 		return;
 
 	njSetTexture(CurrentLandTable->TexList);
@@ -334,13 +194,14 @@ void SaveObj_Main(ObjectMaster* obj)
 	data->Rotation.y += 840;
 
 	AnimateUV_TexID(saveMDLChild->getmodel()->basicdxmodel, 160, 0, -2);
+
 	obj->DisplaySub(obj);
 	AddToCollisionList(data);
 }
 
 void Mill_Display(ObjectMaster* obj)
 {
-	if (MissedFrames)
+	if (MissedFrames || isLeavingGarden)
 		return;
 
 	EntityData1* data = obj->Data1;
@@ -473,9 +334,15 @@ void Set_LadderHack()
 	WriteData<1>((int*)0x536d6b, 0x9);
 }
 
+void SetTranspoterLeaving()
+{
+	DisableController(0);
+	isLeavingGarden = true;
+}
+
 void LoadPirateIsle_Objects()
 {
-	Set_LadderHack();
+	isLeavingGarden = false;
 	LoadObject(LoadObj_Data1, 2, LittleJack_Cameo);
 	return;
 }
@@ -483,6 +350,7 @@ void LoadPirateIsle_Objects()
 void init_ObjectsHack()
 {
 	WriteJump((void*)0x536C20, longladder_Display_r);
+	WriteCall((void*)0x72944B, SetTranspoterLeaving);
 
 	//init new objlist
 	WriteData((ObjectList**)0x974FF8, &EggCarrierChaoGardenObjectList);

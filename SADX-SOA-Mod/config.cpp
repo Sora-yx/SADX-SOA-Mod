@@ -1,7 +1,5 @@
 #include "pch.h"
 
-
-
 uint8_t timeDayOption = 0;
 
 void ReadConfig(const char* path, const HelperFunctions& helperFunctions) {

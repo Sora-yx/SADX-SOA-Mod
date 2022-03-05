@@ -5,7 +5,6 @@ Trampoline* Chao_DetectWater_t;
 extern NJS_VECTOR startpos;
 
 
-
 bool IsChaoInWater(ChaoData1* chaodata1, ChaoData2_* chaodata2)
 {
 	Mysterious64Bytes colthing;
@@ -50,7 +49,7 @@ bool IsChaoInWater(ChaoData1* chaodata1, ChaoData2_* chaodata2)
 
 BOOL __cdecl Chao_DetectWater_r(ObjectMaster* obj)
 {
-	if (CurrentLevel != LevelIDs_ECGarden)
+	if (CurrentChaoStage != SADXChaoStage_EggCarrier)
 	{
 		FunctionPointer(BOOL, origin, (ObjectMaster* obj), Chao_DetectWater_t->Target());
 		return origin(obj);

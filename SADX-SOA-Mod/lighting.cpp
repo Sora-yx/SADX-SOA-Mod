@@ -102,7 +102,8 @@ void RegisterLandPalette(NJS_OBJECT* object)
 
 void UnregisterLandPalette(NJS_OBJECT* object)
 {
-	if (IsLantern == false) return;
+	if (IsLantern == false) 
+		return;
 
 	for (int i = 0; i < object->basicdxmodel->nbMat; ++i)
 	{
@@ -126,7 +127,7 @@ static std::string shaderPath;
 const char* RegisterLevelShader(int32_t level, int32_t act)
 {
 
-	if (CurrentLevel != LevelIDs_ECGarden)
+	if (CurrentChaoStage != SADXChaoStage_MysticRuins && CurrentLevel != LevelIDs_ECGarden)
 		return nullptr;
 
 	shaderPath = "system\\";

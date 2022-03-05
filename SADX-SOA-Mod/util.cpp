@@ -304,10 +304,10 @@ float GetDistance(NJS_VECTOR* orig, NJS_VECTOR* dest) {
 	return sqrtf(powf(dest->x - orig->x, 2) + powf(dest->y - orig->y, 2) + powf(dest->z - orig->z, 2));
 }
 
-
+extern bool isLeavingGarden;
 void obj_DisplaySubRegular(ObjectMaster* obj)
 {
-	if (MissedFrames)
+	if (MissedFrames || isLeavingGarden)
 		return;
 
 	EntityData1* data = obj->Data1;

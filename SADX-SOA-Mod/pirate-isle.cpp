@@ -21,6 +21,12 @@ NJS_TEXLIST PirateBG2_TexList = { arrayptrandlength(PirateBGEvening_TexNames) };
 NJS_TEXNAME PirateBGNight_TexNames[7];
 NJS_TEXLIST PirateBG3_TexList = { arrayptrandlength(PirateBGNight_TexNames) };
 
+NJS_VECTOR startpos = { -64, 0, 73.00 };
+NJS_VECTOR startPosWarp = { -14, 13, -192 };
+
+SecondaryEntrance Pirate_StartPos = { startpos, -0x4000 };
+SecondaryEntrance Pirate_StartPosWarp = { startPosWarp, 0x0 };
+
 void Draw_SkyBoxDay(EntityData1* data)
 {
 	if (getTimeOfDay() != day || !data->Object)
@@ -147,27 +153,6 @@ void PirateIsle_Skybox(ObjectMaster* obj)
 	obj->DisplaySub(obj);
 }
 
-NJS_VECTOR startpos = { 84, 80, 97.64 };
-
-void PlayerStartPos()
-{
-	char posx = 5;
-
-	for (uint8_t i = 0; i < 8; i++) {
-
-		if (!EntityData1Ptrs[i])
-			continue;
-
-		EntityData1Ptrs[i]->Position = startpos;
-		EntityData1Ptrs[i]->Rotation.y = 0x8000;
-
-		if (i)
-			EntityData1Ptrs[i]->Position.x += posx;
-
-		posx += 5;
-	}
-}
-
 void PlayerANTIOob()
 {
 	char posx = 5;
@@ -240,13 +225,6 @@ void PirateIsle_Garden(ObjectMaster* obj)
 		data->Action++;
 		break;
 	case 1:
-		if (++data->Index == 10) {
-			PlayerStartPos();
-	
-			data->Action++;
-		}
-		break;
-	case 2:
 		PlayerANTIOob();
 		break;
 	}
@@ -270,12 +248,15 @@ void Load_PirateMDL()
 	LoadOBJModels();
 }
 
-
-
+VoidFunc(sub_415210, 0x415210);
 void __cdecl ChaoStgGarden01EC_Load_r(ObjectMaster* parent)
 {
-	NJS_VECTOR position; // [esp+4h] [ebp-Ch] BYREF
+
+	Set_LadderHack();
+	NJS_VECTOR position;
+
 	LoadObject(LoadObj_Data1, 8, init_SetObj);
+
 	SetGlobalPoint2Col_Colors(0xFF000000, 0xFF000000, 0xFF000000);
 	LevelFogData.Toggle = 0;
 	//LoadChaoCamCol();
@@ -313,6 +294,7 @@ void __cdecl ChaoStgGarden01EC_Load_r(ObjectMaster* parent)
 
 	PlayMusic(MusicIDs_chao);
 
+	ReleaseSetFile();
 	std::string path = "SETPIRATE.BIN";
 	LoadFileWithMalloc(path.c_str(), (LPVOID*)&SetFiles[CurrentAct]);
 	SetFileB[CurrentAct] = SetFiles[CurrentAct];
@@ -325,8 +307,26 @@ void __cdecl ChaoStgGarden01EC_Load_r(ObjectMaster* parent)
 	CurrentSetFile = CurrentSetFile;
 }
 
+
+void SetNextChaoStage_r(int stage)
+{
+
+	if (CurrentChaoStage != stage) {
+
+		LastChaoStage = CurrentChaoStage;
+		NextChaoStage = stage;
+	}
+
+	if (stage == SADXChaoStage_EggCarrier)
+	{
+		SetNextLevelAndAct_CutsceneMode(LevelIDs_ECGarden, 0);
+	}
+
+}
+
 void LoadPirateIsle_Garden()
 {
+
 	PrintDebug("SOA Mod: Load Pirate Isle Garden...\n");
 
 	LoadLandTableFile(&PirateIsleGeo, "system\\PirateIsle.sa1lvl", &PirateIsle_TexList);
@@ -373,11 +373,17 @@ void SetNewTreePos()
 void init_PirateIsle()
 {
 	WriteData<5>((void*)0x423795, 0x90u); //Prevent DC Mod to load Chao Garden stuff.
+	//WriteJump(SetNextChaoStage, SetNextChaoStage_r);
+	WriteCall((void*)0x71570E, SetNextChaoStage_r);
 	WriteJump(LoadECGarden, LoadPirateIsle_Garden);
 	SetNewTreePos();
+
+	WriteData((SecondaryEntrance**)0x7152de, &Pirate_StartPos);
+	WriteData((SecondaryEntrance**)0x7152e5, &Pirate_StartPosWarp);
+
 	RunLevelDestructor_t = new Trampoline((int)RunLevelDestructor, (int)RunLevelDestructor + 0x6, RunLevelDestructor_r);
 
-	Chao_ECChaoSpawnPoints[0] = { -92, -0, 124};
+	Chao_ECChaoSpawnPoints[0] = { -92, -0, 124 };
 	Chao_ECChaoSpawnPoints[1] = { -40, -0, 127 };
 	Chao_ECChaoSpawnPoints[2] = { 10, -0, 121 };
 	Chao_ECChaoSpawnPoints[3] = { 122, 26, 134 };
@@ -389,7 +395,7 @@ void init_PirateIsle()
 	Chao_ECChaoSpawnPoints[9] = { 38, 13, -192 };
 	Chao_ECChaoSpawnPoints[10] = { 62, 13, -251 };
 	Chao_ECChaoSpawnPoints[11] = { 82, 13, -153 };
-	Chao_ECChaoSpawnPoints[12] = { -88, 26, -84 };
+	Chao_ECChaoSpawnPoints[12] = { -88, 0.0f, -84 };
 	Chao_ECChaoSpawnPoints[13] = { 109, 26, 8.92 };
 	Chao_ECChaoSpawnPoints[14] = { -71, 0, -76 };
 	Chao_ECChaoSpawnPoints[15] = { -28, -0, -67 };
