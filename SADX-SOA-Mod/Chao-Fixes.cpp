@@ -4,7 +4,6 @@ Trampoline* Chao_Main_t;
 Trampoline* Chao_DetectWater_t;
 extern NJS_VECTOR startpos;
 
-
 bool IsChaoInWater(ChaoData1* chaodata1, ChaoData2_* chaodata2)
 {
 	Mysterious64Bytes colthing;
@@ -45,7 +44,6 @@ bool IsChaoInWater(ChaoData1* chaodata1, ChaoData2_* chaodata2)
 
 	return false;
 }
-
 
 BOOL __cdecl Chao_DetectWater_r(ObjectMaster* obj)
 {

@@ -8,7 +8,6 @@ NJS_TEXLIST Houses_TexList = { arrayptrandlength(Houses_TexNames) };
 
 LandTableInfo* PirateIsleGeo = nullptr;
 LandTableInfo* HousesGeo = nullptr;
-Trampoline* RunLevelDestructor_t = nullptr;
 
 static ModelInfo* PirateSkyBox[3];
 
@@ -174,34 +173,27 @@ void PlayerANTIOob()
 	}
 }
 
-
 void SetNumberMaxOfTree(uint8_t number)
 {
 	WriteData<1>((int*)0x717bc6, number);
 	return;
 }
 
-void __cdecl RunLevelDestructor_r(int heap)
+void PirateIsle_Unload()
 {
-	if (heap == 0)
-	{
-		if (LastLevel == LevelIDs_ECGarden || LastLevel == LevelIDs_MRGarden || LastLevel == LevelIDs_SSGarden) {
-			for (uint8_t i = 0; i < LengthOfArray(PirateSkyBox); i++) {
-				FreeMDL(PirateSkyBox[i]);
-			}
-
-			FreeLandTableFile(&PirateIsleGeo);
-			njReleaseTexture(&PirateIsle_TexList);
-			njReleaseTexture(&PirateBG_TexList);
-			njReleaseTexture(&PirateBG2_TexList);
-			njReleaseTexture(&PirateBG3_TexList);
-
+	if (LastLevel == LevelIDs_ECGarden || LastLevel == LevelIDs_MRGarden || LastLevel == LevelIDs_SSGarden) {
+		for (uint8_t i = 0; i < LengthOfArray(PirateSkyBox); i++) {
+			FreeMDL(PirateSkyBox[i]);
 		}
+
+		FreeLandTableFile(&PirateIsleGeo);
+		njReleaseTexture(&PirateIsle_TexList);
+		njReleaseTexture(&PirateBG_TexList);
+		njReleaseTexture(&PirateBG2_TexList);
+		njReleaseTexture(&PirateBG3_TexList);
+
 	}
-
-	TARGET_DYNAMIC(RunLevelDestructor)(heap);
 }
-
 
 void PirateIsle_Delete(ObjectMaster* obj)
 {
@@ -234,10 +226,22 @@ void PirateIsle_Garden(ObjectMaster* obj)
 		Move_WayPoints_ToNewPose();
 		LoadPirateIsle_Objects();
 		LoadChildObject(LoadObj_Data1, Garden_TimeOfDay, obj);
+		data->Position = { 17, -40, 221 };
 		data->Action++;
 		break;
 	case 1:
-		PlayerANTIOob();
+		if (!isLeavingGarden)
+			PlayerANTIOob();
+
+		if (IsPlayerInsideSphere(&data->Position, 20))
+		{
+			isLeavingGarden = true;
+			ForcePlayerAction(0, 12);
+			DisableController(0);
+			data->Action++;
+			GoTo_PirateBase();
+		}
+
 		break;
 	}
 
@@ -260,7 +264,7 @@ void Load_PirateMDL()
 	LoadOBJModels();
 }
 
-VoidFunc(sub_415210, 0x415210);
+
 void __cdecl ChaoStgGarden01EC_Load_r(ObjectMaster* parent)
 {
 
@@ -392,7 +396,6 @@ void init_PirateIsle()
 	WriteData((SecondaryEntrance**)0x7152de, &Pirate_StartPos);
 	WriteData((SecondaryEntrance**)0x7152e5, &Pirate_StartPosWarp);
 
-	RunLevelDestructor_t = new Trampoline((int)RunLevelDestructor, (int)RunLevelDestructor + 0x6, RunLevelDestructor_r);
 
 	Chao_ECChaoSpawnPoints[0] = { -92, -0, 124 };
 	Chao_ECChaoSpawnPoints[1] = { -40, -0, 127 };

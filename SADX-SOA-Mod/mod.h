@@ -2,11 +2,11 @@
 
 extern std::string modpath;
 
+extern bool isLeavingGarden;
 void ReadConfig(const char* path, const HelperFunctions& helperFunctions);
 
 extern HelperFunctions HelperFunctionsGlobal;
 
-void init_PirateIsle();
 void Garden_TimeOfDay(ObjectMaster* obj);
 uint8_t getTimeOfDay();
 void Garden_ForceTimeOfDay(int time);
@@ -25,5 +25,7 @@ enum timeDayOption {
 	alwaysEvening,
 	alwaysNight
 };
+
+const char PirateSecretBase = 8;
 
 #define TARGET_DYNAMIC(name) ((decltype(name##_r)*)name##_t->Target())

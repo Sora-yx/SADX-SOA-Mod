@@ -2,6 +2,7 @@
 
 HelperFunctions HelperFunctionsGlobal;
 std::string modpath;
+void __cdecl PirateBase_Load_r(ObjectMaster* obj);
 
 extern "C" {
 
@@ -18,7 +19,7 @@ extern "C" {
 
 		modpath = path;
 		ReadConfig(path, helperFunctions);
-		init_PirateIsle();
+		init_SOALevels();
 		init_ChaoFixes();
 		init_ObjectsHack();
 	}
@@ -32,6 +33,7 @@ extern "C" {
 
 	__declspec(dllexport) void __cdecl OnFrame()
 	{
+
 
 	}
 

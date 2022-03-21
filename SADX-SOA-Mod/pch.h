@@ -23,5 +23,6 @@
 #include "Objects.h"
 #include "util.h"
 #include "sadx-util.h"
+#include "level.h"
 
 #endif //PCH_H

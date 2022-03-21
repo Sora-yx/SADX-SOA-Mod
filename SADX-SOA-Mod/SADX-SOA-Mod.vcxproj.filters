@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\Pirate Isle">
+      <UniqueIdentifier>{3c38da98-2a07-438f-8637-8735f913f167}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -36,6 +39,9 @@
     <ClInclude Include="Objects.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="level.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -53,12 +59,6 @@
     <ClCompile Include="util.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="pirate-isle.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="TimeOfDay.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="lighting.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -68,8 +68,20 @@
     <ClCompile Include="objects.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="little-jack.cpp">
+    <ClCompile Include="soa-levels.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pirate-isle.cpp">
+      <Filter>Source Files\Pirate Isle</Filter>
+    </ClCompile>
+    <ClCompile Include="pirate-base.cpp">
+      <Filter>Source Files\Pirate Isle</Filter>
+    </ClCompile>
+    <ClCompile Include="little-jack.cpp">
+      <Filter>Source Files\Pirate Isle</Filter>
+    </ClCompile>
+    <ClCompile Include="TimeOfDay.cpp">
+      <Filter>Source Files\Pirate Isle</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

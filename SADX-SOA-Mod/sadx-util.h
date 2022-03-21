@@ -86,3 +86,6 @@ FastcallFunctionPointer(void, DrawChunkModel_, (Sint32* a1, Sint16* a2), 0x7917F
 void SetupWorldMatrix();
 ObjectFunc(init_SetObj, 0x46C3D0);
 
+DataPointer(int, dword_3C85EE4, 0x3C85EE4);
+VoidFunc(Chao_CreatePlayerControlManager, 0x715350);
+
