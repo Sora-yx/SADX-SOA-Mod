@@ -21,9 +21,12 @@ void Load_PirateBaseMDL()
 
 }
 
+
+NJS_VECTOR TriggerLeaveBasePos = { 81, 157, 283 };
+
 NJS_VECTOR startPosPBase = { 76, 157, 192 };
 
-void __cdecl PirateBase_Load_r(ObjectMaster* obj)
+void __cdecl PirateBase_Main_r(ObjectMaster* obj)
 {
 
 	EntityData1* data = obj->Data1;
@@ -49,10 +52,30 @@ void __cdecl PirateBase_Load_r(ObjectMaster* obj)
 	case 1:
 		if (++data->Index == 5)
 		{
-			EntityData1Ptrs[0]->Position = startPosPBase;
+			for (uint8_t i = 0; i < 8; i++) {
+
+				if (EntityData1Ptrs[i]) {
+					EntityData1Ptrs[i]->Position = startPosPBase;
+
+					if (i)
+					{
+						EntityData1Ptrs[i]->Position.x += 5;
+					}
+				}
+			}
+
+			data->Position = TriggerLeaveBasePos;
+
 			data->Action++;
 		}
+		break;
 	case 2:
+
+		if (IsPlayerInsideSphere(&data->Position, 12))
+		{
+			data->Action++;
+			GoTo_CustomChaoArea(PirateIsle);
+		}
 
 		break;
 	}
@@ -66,7 +89,7 @@ void LoadPirateBase_Geometry()
 
 	LoadLandTableFile(&PirateBaseGeo, "system\\PirateBase.sa1lvl", &PirateBase_TexList);
 	LandTable* land = PirateBaseGeo->getlandtable();
-	LoadObject(LoadObj_Data1, 2, PirateBase_Load_r);
+	LoadObject(LoadObj_Data1, 2, PirateBase_Main_r);
 
 	for (int i = 0; i < land->COLCount; ++i) {
 
@@ -82,10 +105,10 @@ void LoadPirateBase_Geometry()
 	return;
 }
 
-
-void GoTo_PirateBase()
+void GoTo_CustomChaoArea(int nextSection)
 {
-	NextChaoStage = PirateSecretBase;
+	ForcePlayerAction(0, 12);
+	NextChaoStage = nextSection;
 	dword_3C85EE4 = 1; //force Chao Garden Manager to the next Chao Level
 	return;
 }

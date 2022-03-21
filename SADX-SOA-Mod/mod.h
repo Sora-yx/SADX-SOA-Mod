@@ -26,6 +26,10 @@ enum timeDayOption {
 	alwaysNight
 };
 
-const char PirateSecretBase = 8;
+enum CustomChaoArea
+{
+	PirateIsle = 5,
+	PirateSecretBase = 8,
+};
 
 #define TARGET_DYNAMIC(name) ((decltype(name##_r)*)name##_t->Target())

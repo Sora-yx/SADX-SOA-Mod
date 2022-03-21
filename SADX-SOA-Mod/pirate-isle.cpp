@@ -233,13 +233,11 @@ void PirateIsle_Garden(ObjectMaster* obj)
 		if (!isLeavingGarden)
 			PlayerANTIOob();
 
-		if (IsPlayerInsideSphere(&data->Position, 20))
+		if (Controllers[0].PressedButtons & AttackButtons && IsPlayerInsideSphere(&data->Position, 20))
 		{
 			isLeavingGarden = true;
-			ForcePlayerAction(0, 12);
-			DisableController(0);
 			data->Action++;
-			GoTo_PirateBase();
+			GoTo_CustomChaoArea(PirateSecretBase);
 		}
 
 		break;
@@ -333,7 +331,7 @@ void SetNextChaoStage_r(int stage)
 		NextChaoStage = stage;
 	}
 
-	if (stage == SADXChaoStage_EggCarrier)
+	if (stage == PirateIsle)
 	{
 		SetNextLevelAndAct_CutsceneMode(LevelIDs_ECGarden, 0);
 	}

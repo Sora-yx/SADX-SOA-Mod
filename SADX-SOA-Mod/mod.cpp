@@ -2,7 +2,7 @@
 
 HelperFunctions HelperFunctionsGlobal;
 std::string modpath;
-void __cdecl PirateBase_Load_r(ObjectMaster* obj);
+void __cdecl PirateBase_Main_r(ObjectMaster* obj);
 
 extern "C" {
 
