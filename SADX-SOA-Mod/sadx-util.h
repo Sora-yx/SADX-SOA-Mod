@@ -89,3 +89,91 @@ ObjectFunc(init_SetObj, 0x46C3D0);
 DataPointer(int, dword_3C85EE4, 0x3C85EE4);
 VoidFunc(Chao_CreatePlayerControlManager, 0x715350);
 
+DataPointer(ObjectMaster*, tp_0, 0x03C49BC4);
+
+struct DlgSndPrmType
+{
+	int OpenSnd;
+	int CloseSnd;
+	int MoveSnd;
+	int DecideSnd;
+	int CancelSnd;
+};
+
+
+struct __declspec(align(4)) PanelPrmType
+{
+	float OfsX;
+	float OfsY;
+	unsigned __int8 PvrIdx;
+};
+
+struct __declspec(align(4)) DDlgType
+{
+	float CntrX;
+	float CntrY;
+	float BaseZ;
+	float SclX;
+	float SclY;
+	char Csr;
+};
+
+
+struct __declspec(align(4)) DialogPrmType
+{
+	int DlgStyle;
+	void(__cdecl* EachDrawFnc)(DDlgType*);
+	NJS_TEXLIST* PnlTlsPtr;
+	PanelPrmType* PnlPrmPtr;
+	DlgSndPrmType* DlgSndPrmPtr;
+	unsigned int DlgColU;
+	unsigned int DlgColD;
+	float CntrX;
+	float CntrY;
+	float BaseZ;
+	float SzX;
+	float SzY;
+	float MagX;
+	float MagY;
+	char CsrMax;
+	char CsrCancel;
+};
+
+#pragma pack(push, 8)
+struct MSGC
+{
+	unsigned __int8 kind;
+	__int16 x;
+	__int16 y;
+	unsigned __int16 width;
+	unsigned __int16 height;
+	unsigned __int16 buf_width;
+	unsigned __int16 buf_height;
+	unsigned __int16 buf_width2;
+	unsigned __int16 buf_height2;
+	__int16 lx;
+	__int16 ly;
+	__int16 sx;
+	__int16 sy;
+	unsigned __int16 color;
+	NJS_COLOR fc;
+	NJS_COLOR bc;
+	float scale;
+	void* bitmap;
+	unsigned int globalindex;
+	NJS_TEXLIST texlist;
+	NJS_TEXNAME texname;
+	int msgc_flag;
+};
+#pragma pack(pop)
+
+
+
+FunctionPointer(void, OpenDialog, (DialogPrmType* arg_0), 0x0432DB0);
+FunctionPointer(ObjectMaster*, SetDialogTask, (), 0x432C60);
+DataPointer(DialogPrmType*, DialogAskQuit, 0x007E06B0);
+VoidFunc(DialogExec, 0x432DD0);
+FunctionPointer(void, sub_40D490, (MSGC* a1), 0x40D490);
+DataPointer(MSGC, msgc, 0x03B22E30);
+FunctionPointer(void, MSG_Open, (MSGC* a1, __int16 a2, __int16 a3, int a4, int a5, int a6), 0x40E430);
+VoidFunc(FreeQueueSound, 0x424460);

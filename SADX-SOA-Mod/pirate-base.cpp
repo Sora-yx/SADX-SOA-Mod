@@ -1,6 +1,5 @@
 #include "pch.h"
 
-
 NJS_TEXNAME PirateBase_TexNames[60];
 NJS_TEXLIST PirateBase_TexList = { arrayptrandlength(PirateBase_TexNames) };
 
@@ -15,20 +14,16 @@ void PirateBase_Delete(ObjectMaster* obj)
 	return;
 }
 
-
 void Load_PirateBaseMDL()
 {
 
 }
 
-
 NJS_VECTOR TriggerLeaveBasePos = { 81, 157, 283 };
-
 NJS_VECTOR startPosPBase = { 76, 157, 192 };
 
 void __cdecl PirateBase_Main_r(ObjectMaster* obj)
 {
-
 	EntityData1* data = obj->Data1;
 
 	switch (data->Action)
@@ -79,7 +74,6 @@ void __cdecl PirateBase_Main_r(ObjectMaster* obj)
 
 		break;
 	}
-
 }
 
 void LoadPirateBase_Geometry()
@@ -109,7 +103,7 @@ void GoTo_CustomChaoArea(int nextSection)
 {
 	ForcePlayerAction(0, 12);
 	NextChaoStage = nextSection;
-	dword_3C85EE4 = 1; //force Chao Garden Manager to the next Chao Level
+	dword_3C85EE4 = 1; //force Chao Garden Manager to change the Chao Level
 	return;
 }
 

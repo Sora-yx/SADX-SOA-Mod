@@ -22,6 +22,7 @@ extern "C" {
 		init_SOALevels();
 		init_ChaoFixes();
 		init_ObjectsHack();
+		init_ObjsCommon();
 	}
 
 	__declspec(dllexport) void __cdecl OnInitEnd() {
@@ -33,7 +34,10 @@ extern "C" {
 
 	__declspec(dllexport) void __cdecl OnFrame()
 	{
-
+		if (GameMode == 9)
+		{
+			GameMode = (GameModes)5;
+		}
 
 	}
 

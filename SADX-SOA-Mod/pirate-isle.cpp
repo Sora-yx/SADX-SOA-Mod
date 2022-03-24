@@ -26,6 +26,9 @@ NJS_VECTOR startPosWarp = { -14, 13, -192 };
 SecondaryEntrance Pirate_StartPos = { startpos, -0x4000 };
 SecondaryEntrance Pirate_StartPosWarp = { startPosWarp, 0x0 };
 
+NJS_VECTOR TriggerSecretBasePos = { 17, -40, 221 };
+NJS_VECTOR TriggerShrinePos = { 518, 160, -109 };
+
 void Draw_SkyBoxDay(EntityData1* data)
 {
 	if (getTimeOfDay() != day || !data->Object)
@@ -152,7 +155,7 @@ void PirateIsle_Skybox(ObjectMaster* obj)
 	obj->DisplaySub(obj);
 }
 
-void PlayerANTIOob()
+void Pirate_PlayerANTIOob()
 {
 	char posx = 5;
 
@@ -216,6 +219,10 @@ void Move_WayPoints_ToNewPose()
 	}
 }
 
+void Pirate_TriggerLeaving(ObjectMaster* obj)
+{
+}
+
 void PirateIsle_Garden(ObjectMaster* obj)
 {
 	EntityData1* data = obj->Data1;
@@ -226,18 +233,24 @@ void PirateIsle_Garden(ObjectMaster* obj)
 		Move_WayPoints_ToNewPose();
 		LoadPirateIsle_Objects();
 		LoadChildObject(LoadObj_Data1, Garden_TimeOfDay, obj);
-		data->Position = { 17, -40, 221 };
 		data->Action++;
 		break;
 	case 1:
 		if (!isLeavingGarden)
-			PlayerANTIOob();
+			Pirate_PlayerANTIOob();
 
-		if (Controllers[0].PressedButtons & AttackButtons && IsPlayerInsideSphere(&data->Position, 20))
+		if (Controllers[0].PressedButtons & AttackButtons && IsPlayerInsideSphere(&TriggerSecretBasePos, 20))
 		{
 			isLeavingGarden = true;
 			data->Action++;
 			GoTo_CustomChaoArea(PirateSecretBase);
+		}
+		else if (Controllers[0].PressedButtons & AttackButtons && IsPlayerInsideSphere(&TriggerShrinePos, 20))
+		{
+			ForcePlayerAction(0, 12);
+			isLeavingGarden = true;
+			data->Action++;
+			SetNextLevelAndAct_CutsceneMode(LevelIDs_MysticRuins, 6);	
 		}
 
 		break;
@@ -259,7 +272,7 @@ void Load_PirateMDL()
 	LoadPVM("PirateIsle-BGTex3", &PirateBG3_TexList);
 
 	LoadLittleJack_ModelAnim();
-	LoadOBJModels();
+	LoadPirateIsle_OBJModels();
 }
 
 

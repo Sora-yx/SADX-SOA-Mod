@@ -7,5 +7,8 @@ void Reset_LadderHack();
 void LoadLittleJack_ModelAnim();
 void LittleJack_Cameo(ObjectMaster* obj);
 void LoadPirateIsle_Objects();
-void LoadOBJModels();
+void LoadPirateIsle_OBJModels();
 void obj_MainGlobal(ObjectMaster* obj);
+
+void init_ObjsCommon();
+void LoadSave_Obj(ObjectMaster* obj);

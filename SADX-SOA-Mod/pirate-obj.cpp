@@ -3,12 +3,10 @@
 static ModelInfo* DojoDoor[2];
 static ModelInfo* Door[2];
 static ModelInfo* Laundry[2];
-static ModelInfo* saveMDL = nullptr;
-static ModelInfo* saveMDLChild = nullptr;
 static ModelInfo* chest = nullptr;
 static ModelInfo* mill = nullptr;
 
-CollisionData saveCol = { 0, CI_FORM_SPHERE, 0x77, 0, 0,{ 0, 10, 0 }, 8.0f, 5.0f, 0.0f };
+
 CollisionData doorCol = { 0, CI_FORM_RECTANGLE, 0x77, 0, 0,{ -7, 10, -2 }, 8.0f, 10.0f, 2.0f };
 CollisionData dojoCol = { 0, CI_FORM_RECTANGLE, 0x77, 0, 0,{ -7, 10, -2 }, 15.0f, 10.0f, 2.0f, 0x0, 0x0, 0 };
 
@@ -133,71 +131,6 @@ void LoadDoor(ObjectMaster* obj)
 	obj->DisplaySub = Door_Display;
 }
 
-void SaveObj_display(ObjectMaster* obj)
-{
-	EntityData1* data = obj->Data1;
-
-	if (MissedFrames || isLeavingGarden)
-		return;
-
-	njSetTexture(CurrentLandTable->TexList);
-	njPushMatrix(0);
-	njTranslateV(0, &data->Position);
-	njRotateY(0, data->Rotation.y);
-	DrawObject(data->Object);
-	njPopMatrix(1u);
-
-
-	njPushMatrix(0);
-	njTranslateV(0, &data->Position);
-	DrawObject(saveMDLChild->getmodel());
-	njPopMatrix(1u);
-}
-
-void SaveObj_Main(ObjectMaster* obj)
-{
-	EntityData1* data = obj->Data1;
-
-	if (ClipSetObject(obj))
-		return;
-
-	switch (data->Action)
-	{
-	case 0:
-		obj->DisplaySub = SaveObj_display;
-		data->Action++;
-		break;
-	case 1:
-		if (IsPlayerInsideSphere(&data->Position, 20))
-		{
-			if (Controllers[0].PressedButtons & Buttons_Y)
-			{
-				data->Action++;
-				ForcePlayerAction(0, 12);
-				SetDebugFontSize(20);
-				//SaveSave();
-			}
-		}
-		break;
-	case 2:
-		DisplayDebugStringFormatted(NJM_LOCATION(2, 2), "SAVED!");
-		if (++data->InvulnerableTime == 70)
-		{
-			ForcePlayerAction(0, 24);
-			SetDebugFontSize(16);
-			data->Action = 1;
-			data->InvulnerableTime = 0;
-		}
-		break;
-	}
-
-	data->Rotation.y += 840;
-
-	AnimateUV_TexID(saveMDLChild->getmodel()->basicdxmodel, 160, 0, -2);
-
-	obj->DisplaySub(obj);
-	AddToCollisionList(data);
-}
 
 void Mill_Display(ObjectMaster* obj)
 {
@@ -243,17 +176,6 @@ void MillObj_Main(ObjectMaster* obj)
 }
 
 
-void LoadSave_Obj(ObjectMaster* obj)
-{
-	EntityData1* data = obj->Data1;
-
-
-	obj->Data1->Object = saveMDL->getmodel();
-	obj->MainSub = SaveObj_Main;
-	Collision_Init(obj, &saveCol, 1, 4u);
-}
-
-
 void LoadLaundry(ObjectMaster* obj)
 {
 	EntityData1* data = obj->Data1;
@@ -290,7 +212,7 @@ ObjectListEntry EggCarrierChaoGardenObjectList_list[] = {
 
 ObjectList EggCarrierChaoGardenObjectList = { arraylengthandptrT(EggCarrierChaoGardenObjectList_list, int) };
 
-void LoadOBJModels()
+void LoadPirateIsle_OBJModels()
 {
 	DojoDoor[0] = LoadBasicModel("DoorDojo");
 	DojoDoor[1] = LoadBasicModel("DoorDojo2");
@@ -298,8 +220,6 @@ void LoadOBJModels()
 	Door[1] = LoadBasicModel("Door2");
 	Laundry[0] = LoadBasicModel("Laundry");
 	Laundry[1] = LoadBasicModel("Laundry2");
-	saveMDL = LoadBasicModel("Save");
-	saveMDLChild = LoadBasicModel("saveChild");
 	mill = LoadBasicModel("Mill");
 	return;
 }

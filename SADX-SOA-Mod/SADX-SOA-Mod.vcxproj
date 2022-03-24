@@ -180,7 +180,8 @@
     <ClCompile Include="lighting.cpp" />
     <ClCompile Include="little-jack.cpp" />
     <ClCompile Include="mod.cpp" />
-    <ClCompile Include="objects.cpp" />
+    <ClCompile Include="obj-common.cpp" />
+    <ClCompile Include="pirate-obj.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -189,6 +190,7 @@
     </ClCompile>
     <ClCompile Include="pirate-base.cpp" />
     <ClCompile Include="pirate-isle.cpp" />
+    <ClCompile Include="Shrine-Island.cpp" />
     <ClCompile Include="soa-levels.cpp" />
     <ClCompile Include="TimeOfDay.cpp" />
     <ClCompile Include="util.cpp" />
